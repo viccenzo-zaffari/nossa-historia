@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nossa História — Plano do Projeto</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fdf8f2;
+    --warm: #f5ece0;
+    --rose: #c9614a;
+    --rose-light: #e8927e;
+    --rose-pale: #f9ede9;
+    --ink: #1c1714;
+    --ink2: #3d2f28;
+    --muted: #9e8a7e;
+    --gold: #b8924a;
+    --gold-light: #d4aa6a;
+    --border: #e8d8cc;
+    --green: #4a7c59;
+    --blue: #3a6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* Grain texture overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.4;
+  }
+
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 28px 80px;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 64px 0 48px;
+    text-align: center;
+    position: relative;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(48px, 8vw, 80px);
+    font-weight: 600;
+    line-height: 1;
+    color: var(--ink);
+    letter-spacing: -1px;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--rose);
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    color: var(--muted);
+    margin-top: 16px;
+    font-weight: 300;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 40px 0;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .divider-icon { color: var(--rose); font-size: 16px; }
+
+  /* Section titles */
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .section-note {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 28px;
+    font-weight: 300;
+  }
+
+  /* Feature Cards */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 56px;
+  }
+
+  @media (max-width: 680px) { .features-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 440px) { .features-grid { grid-template-columns: 1fr; } }
+
+  .feature-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(201,97,74,0.08);
+  }
+
+  .feature-icon {
+    font-size: 28px;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .feature-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+
+  .feature-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .feature-tag {
+    display: inline-block;
+    margin-top: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .tag-mvp { background: rgba(74,124,89,0.1); color: var(--green); }
+  .tag-v2 { background: rgba(58,107,138,0.1); color: var(--blue); }
+  .tag-premium { background: rgba(184,146,74,0.12); color: var(--gold); }
+
+  /* Stack */
+  .stack-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 56px;
+  }
+
+  @media (max-width: 600px) { .stack-grid { grid-template-columns: 1fr; } }
+
+  .stack-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .stack-layer {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 10px;
+  }
+
+  .stack-tech {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .stack-reason {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .stack-list {
+    list-style: none;
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .stack-list li {
+    font-size: 13px;
+    color: var(--ink2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .stack-list li::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--rose-light);
+    flex-shrink: 0;
+  }
+
+  /* Roadmap */
+  .roadmap {
+    margin-bottom: 56px;
+  }
+
+  .phase {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 24px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  @media (max-width: 560px) { .phase { grid-template-columns: 1fr; } }
+
+  .phase-label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding-top: 20px;
+    gap: 4px;
+  }
+
+  @media (max-width: 560px) { .phase-label { align-items: flex-start; padding-top: 0; } }
+
+  .phase-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 40px;
+    font-weight: 600;
+    color: var(--border);
+    line-height: 1;
+  }
+
+  .phase-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .phase-content {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    position: relative;
+  }
+
+  .phase-content::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+  }
+
+  .phase-1 .phase-content::before { background: var(--green); }
+  .phase-2 .phase-content::before { background: var(--blue); }
+  .phase-3 .phase-content::before { background: var(--gold); }
+
+  .phase-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--ink);
+  }
+
+  .phase-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .phase-tasks {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .phase-tasks li {
+    font-size: 14px;
+    color: var(--ink2);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+
+  .check {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .check:hover { border-color: var(--rose-light); }
+  .check.done { background: var(--rose); border-color: var(--rose); }
+  .check.done::after { content: '✓'; color: white; font-size: 11px; }
+
+  li.done-task span { text-decoration: line-through; color: var(--muted); }
+
+  /* Monetization */
+  .mono-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 56px;
+  }
+
+  @media (max-width: 560px) { .mono-grid { grid-template-columns: 1fr; } }
+
+  .mono-card {
+    border-radius: 12px;
+    padding: 28px 24px;
+    border: 1px solid var(--border);
+  }
+
+  .mono-card.featured {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: white;
+  }
+
+  .mono-card:not(.featured) { background: white; }
+
+  .mono-plan {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--rose-light);
+    margin-bottom: 8px;
+  }
+
+  .mono-card:not(.featured) .mono-plan { color: var(--rose); }
+
+  .mono-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 4px;
+    color: var(--cream);
+  }
+
+  .mono-card:not(.featured) .mono-price { color: var(--ink); }
+
+  .mono-period {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    font-weight: 300;
+  }
+
+  .mono-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mono-features li {
+    font-size: 13px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    line-height: 1.5;
+  }
+
+  .mono-features li::before { content: '✦'; font-size: 10px; color: var(--rose-light); margin-top: 2px; }
+  .mono-card:not(.featured) .mono-features li::before { color: var(--rose); }
+  .mono-card:not(.featured) .mono-features li { color: var(--ink2); }
+
+  /* DB Schema */
+  .schema-block {
+    background: #1c1714;
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 56px;
+    overflow-x: auto;
+  }
+
+  .schema-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--rose-light);
+    margin-bottom: 20px;
+  }
+
+  .schema-tables {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 600px) { .schema-tables { grid-template-columns: 1fr; } }
+
+  .table-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .table-name {
+    background: rgba(201,97,74,0.2);
+    padding: 10px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--rose-light);
+    font-weight: 500;
+  }
+
+  .table-fields {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    gap: 8px;
+  }
+
+  .field-name { color: #e8eaf0; }
+  .field-type { color: #6b7280; }
+  .field-pk { color: var(--gold-light); }
+
+  /* Footer */
+  .footer-note {
+    text-align: center;
+    padding: 40px 0 20px;
+    border-top: 1px solid var(--border);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-style: italic;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <div class="hero-eyebrow">Plano do Projeto</div>
+    <h1>Nossa <em>História</em></h1>
+    <p class="hero-sub">Álbum digital de memórias para casais — arquitetura, stack e roadmap completo</p>
+  </div>
+
+  <div class="divider"><span class="divider-icon">♡</span></div>
+
+  <!-- FEATURES -->
+  <div class="section-title">Funcionalidades</div>
+  <p class="section-note">O que o produto entrega — por prioridade de lançamento</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="feature-icon">📸</span>
+      <div class="feature-name">Álbum de Fotos</div>
+      <div class="feature-desc">Upload de fotos com data, legenda e local. Layout em grid elegante com lightbox.</div>
+      <span class="feature-tag tag-mvp">MVP</span>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🗺️</span>
+      <div class="feature-name">Mapa dos Momentos</div>
+      <div class="feature-desc">Mapa interativo com pins em cada local especial do casal.</div>
+      <span class="feature-tag tag-mvp">MVP</span>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">💌</span>
+      <div class="feature-name">Contador de Dias</div>
+      <div class="feature-desc">Contagem em tempo real desde o início do relacionamento.</div>
+      <span class="feature-tag tag-mvp">MVP</span>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔗</span>
+      <div class="feature-name">Link Privado</div>
+      <div class="feature-desc">Cada álbum tem URL única. Pode ser compartilhado publicamente ou mantido privado.</div>
+      <span class="feature-tag tag-mvp">MVP</span>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🎵</span>
+      <div class="feature-name">Música do Casal</div>
+      <div class="feature-desc">Integração com Spotify — embed do player com a música especial deles.</div>
+      <span class="feature-tag tag-v2">V2</span>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">✨</span>
+      <div class="feature-name">Temas & Animações</div>
+      <div class="feature-desc">Temas visuais personalizados, efeitos e transições especiais.</div>
+      <span class="feature-tag tag-premium">Premium</span>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🎞️</span>
+      <div class="feature-name">Linha do Tempo</div>
+      <div class="feature-desc">Vista cronológica das memórias com scroll narrativo.</div>
+      <span class="feature-tag tag-v2">V2</span>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔔</span>
+      <div class="feature-name">Alertas de Aniversário</div>
+      <div class="feature-desc">Notificação automática por email em datas especiais.</div>
+      <span class="feature-tag tag-premium">Premium</span>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📄</span>
+      <div class="feature-name">Exportar PDF / Livro</div>
+      <div class="feature-desc">Gera um livro de memórias em PDF para imprimir.</div>
+      <span class="feature-tag tag-premium">Premium</span>
+    </div>
+  </div>
+
+  <div class="divider"><span class="divider-icon">♡</span></div>
+
+  <!-- STACK -->
+  <div class="section-title">Stack Recomendada</div>
+  <p class="section-note">Tecnologias escolhidas para escalar com simplicidade</p>
+
+  <div class="stack-grid">
+    <div class="stack-card">
+      <div class="stack-layer">Frontend</div>
+      <div class="stack-tech">Next.js 14 + TypeScript</div>
+      <div class="stack-reason">SSR nativo, SEO para os álbuns públicos, e deploy simples na Vercel.</div>
+      <ul class="stack-list">
+        <li>Tailwind CSS para estilo</li>
+        <li>Leaflet.js para o mapa</li>
+        <li>Framer Motion para animações</li>
+        <li>Spotify Embed API</li>
+      </ul>
+    </div>
+    <div class="stack-card">
+      <div class="stack-layer">Backend</div>
+      <div class="stack-tech">FastAPI (Python)</div>
+      <div class="stack-reason">API rápida, tipagem com Pydantic, e você já conhece Python.</div>
+      <ul class="stack-list">
+        <li>SQLAlchemy + PostgreSQL</li>
+        <li>Alembic para migrations</li>
+        <li>JWT para autenticação do criador</li>
+        <li>Celery para tarefas assíncronas</li>
+      </ul>
+    </div>
+    <div class="stack-card">
+      <div class="stack-layer">Armazenamento</div>
+      <div class="stack-tech">Cloudflare R2</div>
+      <div class="stack-reason">Barato, sem egress fee, S3-compatível. Perfeito para fotos em escala.</div>
+      <ul class="stack-list">
+        <li>Thumbnails automáticos</li>
+        <li>CDN global incluso</li>
+        <li>Custo previsível</li>
+      </ul>
+    </div>
+    <div class="stack-card">
+      <div class="stack-layer">Pagamentos & Deploy</div>
+      <div class="stack-tech">Stripe + Railway</div>
+      <div class="stack-reason">Stripe para assinatura e compra única. Railway para hospedar o backend com zero config.</div>
+      <ul class="stack-list">
+        <li>Frontend: Vercel (free tier)</li>
+        <li>DB: Supabase PostgreSQL</li>
+        <li>Email: Resend</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"><span class="divider-icon">♡</span></div>
+
+  <!-- SCHEMA -->
+  <div class="section-title">Modelo de Dados</div>
+  <p class="section-note">Estrutura principal do banco de dados</p>
+
+  <div class="schema-block">
+    <div class="schema-title">// Database Schema</div>
+    <div class="schema-tables">
+      <div class="table-box">
+        <div class="table-name">albums</div>
+        <div class="table-fields">
+          <div class="field"><span class="field-name field-pk">id</span><span class="field-type">uuid PK</span></div>
+          <div class="field"><span class="field-name">slug</span><span class="field-type">varchar unique</span></div>
+          <div class="field"><span class="field-name">couple_names</span><span class="field-type">varchar</span></div>
+          <div class="field"><span class="field-name">start_date</span><span class="field-type">date</span></div>
+          <div class="field"><span class="field-name">theme</span><span class="field-type">varchar</span></div>
+          <div class="field"><span class="field-name">spotify_url</span><span class="field-type">text</span></div>
+          <div class="field"><span class="field-name">is_public</span><span class="field-type">boolean</span></div>
+          <div class="field"><span class="field-name">plan</span><span class="field-type">enum</span></div>
+          <div class="field"><span class="field-name">created_at</span><span class="field-type">timestamp</span></div>
+        </div>
+      </div>
+      <div class="table-box">
+        <div class="table-name">memories</div>
+        <div class="table-fields">
+          <div class="field"><span class="field-name field-pk">id</span><span class="field-type">uuid PK</span></div>
+          <div class="field"><span class="field-name">album_id</span><span class="field-type">uuid FK</span></div>
+          <div class="field"><span class="field-name">title</span><span class="field-type">varchar</span></div>
+          <div class="field"><span class="field-name">description</span><span class="field-type">text</span></div>
+          <div class="field"><span class="field-name">date</span><span class="field-type">date</span></div>
+          <div class="field"><span class="field-name">location_name</span><span class="field-type">varchar</span></div>
+          <div class="field"><span class="field-name">lat / lng</span><span class="field-type">decimal</span></div>
+          <div class="field"><span class="field-name">photo_url</span><span class="field-type">text</span></div>
+          <div class="field"><span class="field-name">order</span><span class="field-type">integer</span></div>
+        </div>
+      </div>
+      <div class="table-box">
+        <div class="table-name">orders</div>
+        <div class="table-fields">
+          <div class="field"><span class="field-name field-pk">id</span><span class="field-type">uuid PK</span></div>
+          <div class="field"><span class="field-name">album_id</span><span class="field-type">uuid FK</span></div>
+          <div class="field"><span class="field-name">stripe_id</span><span class="field-type">varchar</span></div>
+          <div class="field"><span class="field-name">plan</span><span class="field-type">enum</span></div>
+          <div class="field"><span class="field-name">status</span><span class="field-type">enum</span></div>
+          <div class="field"><span class="field-name">amount</span><span class="field-type">integer</span></div>
+          <div class="field"><span class="field-name">created_at</span><span class="field-type">timestamp</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"><span class="divider-icon">♡</span></div>
+
+  <!-- ROADMAP -->
+  <div class="section-title">Roadmap</div>
+  <p class="section-note">Clique nas tarefas para marcar como concluído</p>
+
+  <div class="roadmap">
+    <div class="phase phase-1">
+      <div class="phase-label">
+        <div class="phase-num">01</div>
+        <div class="phase-name">MVP</div>
+      </div>
+      <div class="phase-content">
+        <div class="phase-title">Lançamento Inicial</div>
+        <div class="phase-time">4–6 semanas</div>
+        <ul class="phase-tasks">
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>Setup do projeto Next.js + FastAPI</span></li>
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>Criação de álbum com link único (slug)</span></li>
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>Upload e exibição de fotos (Cloudflare R2)</span></li>
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>Contador de dias ao vivo</span></li>
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>Mapa com pins de locais (Leaflet.js)</span></li>
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>Design responsivo e animações suaves</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase phase-2">
+      <div class="phase-label">
+        <div class="phase-num">02</div>
+        <div class="phase-name">V2</div>
+      </div>
+      <div class="phase-content">
+        <div class="phase-title">Experiência Completa</div>
+        <div class="phase-time">3–4 semanas após MVP</div>
+        <ul class="phase-tasks">
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>Integração com Spotify (embed player)</span></li>
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>Linha do tempo cronológica</span></li>
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>Dashboard do criador (editar álbum)</span></li>
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>Integração de pagamento com Stripe</span></li>
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>SEO + Open Graph para compartilhamento</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase phase-3">
+      <div class="phase-label">
+        <div class="phase-num">03</div>
+        <div class="phase-name">Premium</div>
+      </div>
+      <div class="phase-content">
+        <div class="phase-title">Escala & Monetização</div>
+        <div class="phase-time">Após validação de mercado</div>
+        <ul class="phase-tasks">
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>Temas visuais (romântico, minimalista, vintage…)</span></li>
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>Exportar álbum em PDF / livro imprimível</span></li>
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>Notificações de aniversário por email</span></li>
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>Vídeos curtos (além de fotos)</span></li>
+          <li><div class="check" onclick="toggleCheck(this)"></div><span>Analytics do criador (visitas ao álbum)</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"><span class="divider-icon">♡</span></div>
+
+  <!-- MONETIZATION -->
+  <div class="section-title">Modelo de Negócio</div>
+  <p class="section-note">Duas frentes de receita complementares</p>
+
+  <div class="mono-grid">
+    <div class="mono-card">
+      <div class="mono-plan">Compra Única</div>
+      <div class="mono-price">R$29</div>
+      <div class="mono-period">acesso vitalício ao álbum</div>
+      <ul class="mono-features">
+        <li>Álbum completo com todas as features MVP</li>
+        <li>Link público ou privado</li>
+        <li>Fotos ilimitadas</li>
+        <li>Mapa de locais</li>
+        <li>Contador de dias</li>
+      </ul>
+    </div>
+    <div class="mono-card featured">
+      <div class="mono-plan">✦ Assinatura Premium</div>
+      <div class="mono-price">R$9</div>
+      <div class="mono-period">por mês · cancele quando quiser</div>
+      <ul class="mono-features">
+        <li>Tudo do plano básico</li>
+        <li>Música do Spotify</li>
+        <li>Temas exclusivos</li>
+        <li>Exportar em PDF</li>
+        <li>Notificações de aniversário</li>
+        <li>Sem marca d'água</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="footer-note">Feito com cuidado — cada casal tem uma história única ♡</p>
+
+</div>
+
+<script>
+  function toggleCheck(el) {
+    el.classList.toggle('done');
+    const li = el.parentElement;
+    li.classList.toggle('done-task');
+  }
+</script>
+</body>
+</html>

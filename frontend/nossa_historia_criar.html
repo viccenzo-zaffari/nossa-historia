@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nossa História — Criar Álbum</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Lato:wght@300;400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root {
+    --bg: #faf7f4;
+    --cream: #f5efe8;
+    --warm-white: #fffdf9;
+    --rose: #b5604a;
+    --rose-light: #d4856f;
+    --rose-pale: #f2e4de;
+    --rose-hover: #a04035;
+    --gold: #c9a96e;
+    --gold-light: #e2c99a;
+    --ink: #2a1f1a;
+    --ink2: #4a3a33;
+    --muted: #9a857a;
+    --border: #e8ddd5;
+    --border-focus: #b5604a;
+    --shadow: rgba(42,31,26,0.08);
+    --success: #4a7c59;
+    --error: #c0392b;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* TOP BAR */
+  .top-bar {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 12px var(--shadow);
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-style: italic;
+    color: var(--rose);
+    text-decoration: none;
+  }
+  .logo span { color: var(--ink); font-style: normal; }
+  .top-step-info { font-size: 13px; color: var(--muted); }
+  .top-step-info strong { color: var(--ink); }
+
+  /* PROGRESS */
+  .progress-wrap {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+  }
+  .progress-steps {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    padding: 20px 0;
+  }
+  .step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    position: relative;
+  }
+  .step-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: calc(50% + 20px);
+    right: calc(-50% + 20px);
+    top: 18px;
+    height: 1px;
+    background: var(--border);
+    transition: background 0.4s;
+  }
+  .step-item.done:not(:last-child)::after { background: var(--rose-light); }
+  .step-circle {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    background: var(--warm-white);
+    transition: all 0.3s;
+    position: relative; z-index: 1;
+    color: var(--muted);
+  }
+  .step-item.active .step-circle {
+    border-color: var(--rose);
+    background: var(--rose);
+    color: white;
+    box-shadow: 0 0 0 4px var(--rose-pale);
+  }
+  .step-item.done .step-circle {
+    border-color: var(--rose-light);
+    background: var(--rose-light);
+    color: white;
+  }
+  .step-label {
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    text-align: center;
+    white-space: nowrap;
+  }
+  .step-item.active .step-label { color: var(--rose); font-weight: 700; }
+  .step-item.done .step-label { color: var(--ink2); }
+  @media (max-width: 600px) { .step-label { display: none; } }
+
+  /* LAYOUT */
+  .page-body {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 120px;
+  }
+
+  /* STEP PANELS */
+  .step-panel { display: none; animation: fadeIn 0.35s ease; }
+  .step-panel.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px; font-weight: 400;
+    color: var(--ink); margin-bottom: 6px;
+  }
+  .panel-title em { font-style: italic; color: var(--rose); }
+  .panel-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 17px;
+    color: var(--muted); margin-bottom: 40px;
+  }
+
+  /* FORM ELEMENTS */
+  .field-group { margin-bottom: 24px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 540px) { .field-row { grid-template-columns: 1fr; } }
+  label {
+    display: block;
+    font-size: 11px; letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink2); margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .label-opt {
+    font-size: 11px; letter-spacing: 0;
+    text-transform: none; color: var(--muted);
+    font-weight: 300; margin-left: 6px;
+  }
+  input[type="text"], input[type="email"], input[type="date"],
+  input[type="password"], input[type="url"], select, textarea {
+    width: 100%;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 13px 16px;
+    font-size: 15px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px var(--rose-pale);
+  }
+  input::placeholder, textarea::placeholder { color: var(--muted); font-style: italic; }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+  .field-hint { font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic; }
+  .field-error { font-size: 12px; color: var(--error); margin-top: 5px; display: none; }
+  .field-error.show { display: block; }
+  input.has-error { border-color: var(--error) !important; }
+
+  /* UPLOAD */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+    position: relative;
+  }
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: var(--rose-light);
+    background: var(--rose-pale);
+  }
+  .upload-zone input[type="file"] {
+    position: absolute; inset: 0; opacity: 0;
+    cursor: pointer; border: none; padding: 0;
+    width: 100%; height: 100%;
+  }
+  .upload-icon { font-size: 40px; margin-bottom: 12px; display: block; }
+  .upload-text { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--ink2); margin-bottom: 6px; }
+  .upload-sub { font-size: 13px; color: var(--muted); }
+
+  .photos-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px; margin-top: 20px;
+  }
+  .photo-thumb {
+    position: relative; border-radius: 6px;
+    overflow: hidden; background: var(--cream);
+    aspect-ratio: 1; border: 1px solid var(--border);
+  }
+  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb-overlay {
+    position: absolute; inset: 0;
+    background: rgba(42,31,26,0.55);
+    opacity: 0; transition: opacity 0.2s;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 6px; padding: 8px;
+  }
+  .photo-thumb:hover .thumb-overlay { opacity: 1; }
+  .thumb-remove {
+    background: var(--rose); border: none; color: white;
+    border-radius: 50%; width: 28px; height: 28px;
+    cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .thumb-num { font-size: 11px; color: white; font-style: italic; }
+
+  .photo-meta-list { display: flex; flex-direction: column; gap: 14px; }
+  .photo-meta-item {
+    background: white; border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px;
+    display: grid; grid-template-columns: 72px 1fr; gap: 14px; align-items: start;
+  }
+  .meta-thumb { width: 72px; height: 72px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); }
+  .meta-fields { display: flex; flex-direction: column; gap: 8px; }
+  .meta-fields input { padding: 9px 12px; font-size: 14px; }
+  .meta-fields .field-row { gap: 8px; }
+
+  /* MAP */
+  #place-map {
+    height: 340px; border-radius: 8px;
+    border: 1px solid var(--border); overflow: hidden;
+    box-shadow: 0 4px 20px var(--shadow);
+  }
+  .map-tip {
+    font-size: 13px; color: var(--muted); font-style: italic;
+    padding: 10px 16px; background: var(--cream);
+    border-radius: 6px; border: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .places-list { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+  .place-item {
+    background: white; border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 16px;
+    display: flex; align-items: center; gap: 12px;
+    animation: fadeIn 0.25s ease;
+  }
+  .place-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--rose); flex-shrink: 0; }
+  .place-info { flex: 1; }
+  .place-name { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .place-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .place-remove {
+    background: none; border: 1px solid var(--border);
+    border-radius: 6px; color: var(--muted);
+    padding: 5px 10px; cursor: pointer; font-size: 12px;
+    transition: all 0.15s;
+  }
+  .place-remove:hover { border-color: var(--rose); color: var(--rose); }
+
+  /* MUSIC */
+  .spotify-preview {
+    background: linear-gradient(135deg, #1DB954, #158a3e);
+    border-radius: 10px; padding: 18px 20px;
+    color: white; display: none;
+    align-items: center; gap: 14px; margin-top: 14px;
+  }
+  .spotify-preview.show { display: flex; }
+  .spotify-preview strong { display: block; font-size: 15px; }
+  .spotify-preview span { font-size: 13px; opacity: 0.8; }
+
+  /* PLANS */
+  .plan-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+  @media (max-width: 480px) { .plan-cards { grid-template-columns: 1fr; } }
+  .plan-card {
+    border: 2px solid var(--border); border-radius: 12px;
+    padding: 26px 22px; cursor: pointer;
+    transition: all 0.2s; position: relative; background: white;
+  }
+  .plan-card:hover { border-color: var(--rose-light); }
+  .plan-card.selected { border-color: var(--rose); background: var(--rose-pale); }
+  .plan-card.selected::after {
+    content: '✓';
+    position: absolute; top: 14px; right: 14px;
+    width: 24px; height: 24px;
+    background: var(--rose); border-radius: 50%;
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; line-height: 24px; text-align: center;
+  }
+  .plan-badge { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 8px; }
+  .plan-price { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 700; color: var(--ink); line-height: 1; }
+  .plan-period { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .plan-features li { font-size: 13px; color: var(--ink2); display: flex; gap: 8px; line-height: 1.4; }
+  .plan-features li::before { content: '✦'; font-size: 10px; color: var(--rose-light); margin-top: 2px; flex-shrink: 0; }
+
+  /* SUMMARY */
+  .summary-box {
+    background: var(--cream); border: 1px solid var(--border);
+    border-radius: 10px; padding: 22px; margin-bottom: 22px;
+  }
+  .summary-title { font-family: 'Playfair Display', serif; font-size: 17px; margin-bottom: 14px; }
+  .summary-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 14px; padding: 8px 0; border-bottom: 1px solid var(--border); color: var(--ink2);
+  }
+  .summary-row:last-child { border-bottom: none; font-weight: 700; font-size: 16px; color: var(--ink); }
+  .summary-row span:last-child { color: var(--rose); }
+
+  /* PAYMENT */
+  .payment-box {
+    background: white; border: 1px solid var(--border);
+    border-radius: 12px; padding: 26px;
+  }
+  .payment-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+  }
+  .payment-header strong { display: block; font-size: 15px; color: var(--ink); }
+  .payment-header span { font-size: 13px; color: var(--muted); }
+  .card-wrap { position: relative; }
+  .card-wrap .card-flag { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 20px; pointer-events: none; }
+  .secure-note { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); margin-top: 16px; justify-content: center; }
+
+  /* BUTTONS */
+  .btn-row {
+    display: flex; gap: 12px;
+    justify-content: space-between;
+    margin-top: 40px; padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+  .btn {
+    padding: 13px 28px; border-radius: 100px;
+    font-size: 14px; font-family: 'Lato', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+    font-weight: 400; letter-spacing: 0.5px; border: none;
+  }
+  .btn-back {
+    background: none; border: 1px solid var(--border); color: var(--muted);
+  }
+  .btn-back:hover { border-color: var(--ink2); color: var(--ink); }
+  .btn-next {
+    background: linear-gradient(135deg, var(--rose) 0%, var(--rose-light) 100%);
+    color: white; box-shadow: 0 4px 16px rgba(181,96,74,0.25);
+  }
+  .btn-next:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(181,96,74,0.35); }
+  .btn-next:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-pay {
+    background: linear-gradient(135deg, #2a1f1a, #4a3a33);
+    color: white; padding: 16px 40px; font-size: 15px;
+    box-shadow: 0 4px 20px rgba(42,31,26,0.2);
+  }
+  .btn-pay:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(42,31,26,0.3); }
+
+  /* SUCCESS */
+  .success-screen { text-align: center; padding: 60px 0; }
+  .success-icon { font-size: 72px; display: block; margin-bottom: 24px; animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .success-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 400; color: var(--ink); margin-bottom: 10px; }
+  .success-title em { font-style: italic; color: var(--rose); }
+  .success-sub { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px; color: var(--muted); margin-bottom: 40px; }
+  .link-box {
+    background: white; border: 2px solid var(--border);
+    border-radius: 10px; padding: 18px 20px;
+    display: flex; align-items: center; gap: 12px;
+    max-width: 520px; margin: 0 auto 32px;
+    transition: border-color 0.2s;
+  }
+  .link-box:hover { border-color: var(--rose-light); }
+  .link-url { font-family: monospace; font-size: 14px; color: var(--rose); flex: 1; text-align: left; word-break: break-all; }
+  .btn-copy { background: var(--rose); color: white; border: none; border-radius: 6px; padding: 8px 16px; font-size: 13px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .btn-copy:hover { background: var(--rose-hover); }
+  .btn-copy.copied { background: var(--success); }
+  .success-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(42,31,26,0.6);
+    z-index: 500; display: none;
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: 12px;
+    padding: 32px; width: 100%; max-width: 420px;
+    animation: fadeIn 0.25s ease;
+  }
+  .modal h3 { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 6px; }
+  .modal p { font-size: 14px; color: var(--muted); margin-bottom: 20px; font-style: italic; }
+  .modal .btn-row { margin-top: 20px; padding-top: 20px; }
+
+  .divider-orn { text-align: center; color: var(--gold-light); font-size: 16px; margin: 28px 0; letter-spacing: 8px; }
+  .tag-prem { display: inline-block; background: rgba(201,169,110,0.12); color: var(--gold); border: 1px solid rgba(201,169,110,0.3); font-size: 10px; padding: 2px 7px; border-radius: 3px; letter-spacing: 1px; text-transform: uppercase; margin-left: 6px; vertical-align: middle; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--cream); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <a class="logo" href="#">Nossa <span>História</span></a>
+  <div class="top-step-info">Etapa <strong id="top-num">1</strong> de 5</div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-steps">
+    <div class="step-item active" id="si-1"><div class="step-circle">1</div><div class="step-label">O Casal</div></div>
+    <div class="step-item" id="si-2"><div class="step-circle">2</div><div class="step-label">Fotos</div></div>
+    <div class="step-item" id="si-3"><div class="step-circle">3</div><div class="step-label">Lugares</div></div>
+    <div class="step-item" id="si-4"><div class="step-circle">4</div><div class="step-label">Música</div></div>
+    <div class="step-item" id="si-5"><div class="step-circle">5</div><div class="step-label">Publicar</div></div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- STEP 1: O CASAL -->
+  <div class="step-panel active" id="p-1">
+    <h2 class="panel-title">Quem são <em>vocês?</em></h2>
+    <p class="panel-subtitle">Comece pelo mais importante — os dois.</p>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label>Nome 1</label>
+        <input type="text" id="name1" placeholder="Seu nome" maxlength="30">
+        <div class="field-error" id="e-name1">Preencha o nome.</div>
+      </div>
+      <div class="field-group">
+        <label>Nome 2</label>
+        <input type="text" id="name2" placeholder="Nome do seu amor" maxlength="30">
+        <div class="field-error" id="e-name2">Preencha o nome.</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>Data em que ficaram juntos</label>
+      <input type="date" id="start-date">
+      <div class="field-error" id="e-date">Selecione a data.</div>
+      <div class="field-hint">Esse é o início do contador de dias ♥</div>
+    </div>
+
+    <div class="field-group">
+      <label>Uma frase especial <span class="label-opt">opcional</span></label>
+      <textarea id="couple-quote" placeholder="Ex: Em cada olhar, a certeza de que você é o meu lar..." rows="2"></textarea>
+    </div>
+
+    <div class="divider-orn">· · ♥ · ·</div>
+
+    <div class="field-group">
+      <label>Seu e-mail <span class="label-opt">para acessar o álbum depois</span></label>
+      <input type="email" id="owner-email" placeholder="seuemail@exemplo.com">
+      <div class="field-error" id="e-email">Insira um e-mail válido.</div>
+      <div class="field-hint">Enviamos o link de edição para este e-mail. Nunca compartilhado.</div>
+    </div>
+
+    <div class="field-group">
+      <label>Senha de edição</label>
+      <input type="password" id="owner-pass" placeholder="Mínimo 8 caracteres">
+      <div class="field-error" id="e-pass">Mínimo de 8 caracteres.</div>
+      <div class="field-hint">Use para editar o álbum depois de publicado.</div>
+    </div>
+
+    <div class="btn-row" style="justify-content:flex-end">
+      <button class="btn btn-next" onclick="goTo(2)">Continuar → Fotos</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: FOTOS -->
+  <div class="step-panel" id="p-2">
+    <h2 class="panel-title">As <em>memórias</em></h2>
+    <p class="panel-subtitle">Adicione as fotos mais especiais de vocês.</p>
+
+    <div class="upload-zone" id="upload-zone">
+      <input type="file" id="photo-input" multiple accept="image/*" onchange="addPhotos(this.files)">
+      <span class="upload-icon">📷</span>
+      <div class="upload-text">Arraste suas fotos aqui</div>
+      <div class="upload-sub">ou clique para selecionar · JPG, PNG, WEBP · máx. 10MB</div>
+    </div>
+
+    <div class="photos-preview" id="photos-preview"></div>
+
+    <div id="meta-section" style="display:none;margin-top:32px">
+      <div class="divider-orn">· · ♥ · ·</div>
+      <h3 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:4px">Detalhes de cada foto</h3>
+      <p style="font-size:13px;color:var(--muted);font-style:italic;margin-bottom:18px">Título, data e local de cada memória.</p>
+      <div class="photo-meta-list" id="meta-list"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="goTo(1)">← Voltar</button>
+      <button class="btn btn-next" onclick="goTo(3)">Continuar → Lugares</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: LUGARES -->
+  <div class="step-panel" id="p-3">
+    <h2 class="panel-title">Os <em>lugares</em></h2>
+    <p class="panel-subtitle">Marque no mapa os locais especiais para vocês.</p>
+
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <input type="text" id="place-search-input" placeholder="🔍 Ex: Copacabana, Rio de Janeiro" style="flex:1" onkeydown="if(event.key==='Enter') searchPlaceForm()">
+      <button class="btn btn-next" onclick="searchPlaceForm()" style="width:auto;padding:0 20px">Buscar</button>
+    </div>
+    <div id="place-search-results" style="display:none;margin-bottom:12px;display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto"></div>
+    <div id="place-map"></div>
+    <div class="places-list" id="places-list"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="goTo(2)">← Voltar</button>
+      <button class="btn btn-next" onclick="goTo(4)">Continuar → Música</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: MÚSICA -->
+  <div class="step-panel" id="p-4">
+    <h2 class="panel-title">A <em>música</em> de vocês</h2>
+    <p class="panel-subtitle">A canção que conta a história de vocês.</p>
+
+    <div class="field-group">
+      <label>Link do Spotify <span class="label-opt">opcional</span> <span class="tag-prem">Premium</span></label>
+      <input type="url" id="spotify-url" placeholder="https://open.spotify.com/track/..." oninput="previewSpotify(this.value)">
+      <div class="field-hint">Spotify → 3 pontinhos → Compartilhar → Copiar link da música</div>
+    </div>
+
+    <div class="spotify-preview" id="spotify-preview">
+      <span style="font-size:28px">🎵</span>
+      <div>
+        <strong id="sp-name">Música vinculada com sucesso</strong>
+        <span id="sp-sub">O player aparecerá no seu álbum ✓</span>
+      </div>
+    </div>
+
+    <div class="divider-orn">· · ♥ · ·</div>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label>Nome da música</label>
+        <input type="text" id="music-name" placeholder="Ex: Perfect">
+      </div>
+      <div class="field-group">
+        <label>Artista</label>
+        <input type="text" id="music-artist" placeholder="Ex: Ed Sheeran">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>Uma frase da letra <span class="label-opt">opcional</span></label>
+      <textarea id="music-quote" rows="2" placeholder="Ex: I found a love for me..."></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="goTo(3)">← Voltar</button>
+      <button class="btn btn-next" onclick="goTo(5)">Continuar → Publicar</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: PUBLICAR -->
+  <div class="step-panel" id="p-5">
+    <h2 class="panel-title">Quase <em>lá</em> ♥</h2>
+    <p class="panel-subtitle">Escolha um plano e publique a história de vocês.</p>
+
+    <div class="plan-cards">
+      <div class="plan-card" id="plan-basic" onclick="choosePlan('basic')">
+        <div class="plan-badge">Compra única</div>
+        <div class="plan-price">R$29</div>
+        <div class="plan-period">acesso vitalício</div>
+        <ul class="plan-features">
+          <li>Álbum completo com fotos</li>
+          <li>Contador de dias ao vivo</li>
+          <li>Mapa de lugares especiais</li>
+          <li>Link público para compartilhar</li>
+        </ul>
+      </div>
+      <div class="plan-card selected" id="plan-premium" onclick="choosePlan('premium')">
+        <div class="plan-badge">✦ Premium — mais popular</div>
+        <div class="plan-price">R$9<span style="font-size:17px;font-weight:400">/mês</span></div>
+        <div class="plan-period">cancele quando quiser</div>
+        <ul class="plan-features">
+          <li>Tudo do plano básico</li>
+          <li>Música do Spotify integrada</li>
+          <li>Temas visuais exclusivos</li>
+          <li>Exportar em PDF / livro</li>
+          <li>Alertas de aniversário</li>
+          <li>Sem marca d'água</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-title">Resumo do álbum</div>
+      <div class="summary-row"><span>Casal</span><span id="s-couple">—</span></div>
+      <div class="summary-row"><span>Fotos adicionadas</span><span id="s-photos">0 fotos</span></div>
+      <div class="summary-row"><span>Lugares no mapa</span><span id="s-places">0 lugares</span></div>
+      <div class="summary-row"><span>Plano</span><span id="s-plan">Premium · R$9/mês</span></div>
+      <div class="summary-row"><span>Total hoje</span><span id="s-total">R$9,00</span></div>
+    </div>
+
+    <div class="payment-box">
+      <div class="payment-header">
+        <span style="font-size:20px">🔒</span>
+        <div>
+          <strong>Pagamento seguro via Stripe</strong>
+          <span>Você será redirecionado para a página segura do Stripe</span>
+        </div>
+      </div>
+      <div class="secure-note">🔐 Seus dados de cartão nunca passam pelo nosso servidor · SSL · Stripe</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="goTo(4)">← Voltar</button>
+      <button class="btn btn-next btn-pay" id="pay-btn" onclick="finalizar()">♥ Publicar nossa história</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="step-panel" id="p-success">
+    <div class="success-screen">
+      <span class="success-icon">🎉</span>
+      <h2 class="success-title">Álbum <em>publicado!</em></h2>
+      <p class="success-sub">A história de vocês está no ar. Compartilhe com quem ama ♥</p>
+      <div class="link-box">
+        <div class="link-url" id="album-url">nossahistoria.com/ana-e-lucas</div>
+        <button class="btn-copy" id="copy-btn" onclick="copyUrl()">Copiar</button>
+      </div>
+      <div class="success-actions">
+        <button class="btn btn-next" onclick="window.open('#')">Ver meu álbum ↗</button>
+        <button class="btn btn-back" onclick="shareWpp()">Compartilhar no WhatsApp</button>
+      </div>
+      <p style="margin-top:48px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;color:var(--muted)">
+        O link de edição foi enviado para o seu e-mail ♥
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL: nomear lugar -->
+<div class="modal-overlay" id="modal-place">
+  <div class="modal">
+    <h3>Nomear este lugar</h3>
+    <p>Dê um nome carinhoso para este lugar especial no mapa de vocês.</p>
+    <div class="field-group">
+      <label>Nome do lugar</label>
+      <input type="text" id="m-place-name" placeholder="Ex: Onde nos conhecemos">
+    </div>
+    <div class="field-group">
+      <label>Descrição <span class="label-opt">opcional</span></label>
+      <input type="text" id="m-place-desc" placeholder="Ex: Nosso primeiro encontro">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-next" onclick="confirmPlace()">Adicionar ♥</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+const S = {
+  step: 1,
+  photos: [],
+  places: [],
+  plan: 'premium',
+  pendingLL: null,
+  mapInited: false,
+  mapInst: null,
+  markersLayer: null,
+};
+
+// ── NAVIGATION ──
+function goTo(n) {
+  if (typeof n === 'number' && n > S.step && !validate(S.step)) return;
+
+  S.step = n;
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  const pid = (n === 'success') ? 'p-success' : `p-${n}`;
+  document.getElementById(pid).classList.add('active');
+
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById(`si-${i}`);
+    const circ = el.querySelector('.step-circle');
+    el.classList.remove('active','done');
+    if (typeof n === 'number' && i < n) {
+      el.classList.add('done'); circ.textContent = '✓';
+    } else if (i === n) {
+      el.classList.add('active'); circ.textContent = i;
+    } else {
+      circ.textContent = i;
+    }
+  }
+
+  document.getElementById('top-num').textContent = (n === 'success') ? 5 : n;
+  if (n === 3) initMap();
+  if (n === 5) buildSummary();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── VALIDATE ──
+function validate(step) {
+  let ok = true;
+  if (step === 1) {
+    const n1 = v('name1'), n2 = v('name2'), dt = v('start-date'),
+          em = v('owner-email'), pw = v('owner-pass');
+    err('e-name1', !n1); if (!n1) ok = false;
+    err('e-name2', !n2); if (!n2) ok = false;
+    err('e-date', !dt); if (!dt) ok = false;
+    const emailOk = em && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em);
+    err('e-email', !emailOk); if (!emailOk) ok = false;
+    err('e-pass', pw.length < 8); if (pw.length < 8) ok = false;
+  }
+  return ok;
+}
+
+function v(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function err(id, show) { document.getElementById(id).classList.toggle('show', show); }
+
+// ── PHOTOS ──
+function addPhotos(files) {
+  Array.from(files).forEach(f => {
+    if (!f.type.startsWith('image/')) return;
+    S.photos.push({ file: f, url: URL.createObjectURL(f), title: '', date: '', loc: '' });
+  });
+  renderPhotos();
+}
+
+function removePhoto(i) { S.photos.splice(i,1); renderPhotos(); }
+
+function renderPhotos() {
+  const prev = document.getElementById('photos-preview');
+  const ms = document.getElementById('meta-section');
+  const ml = document.getElementById('meta-list');
+  prev.innerHTML = ''; ml.innerHTML = '';
+
+  if (!S.photos.length) { ms.style.display = 'none'; return; }
+  ms.style.display = 'block';
+
+  S.photos.forEach((p, i) => {
+    prev.innerHTML += `
+      <div class="photo-thumb">
+        <img src="${p.url}" alt="">
+        <div class="thumb-overlay">
+          <button class="thumb-remove" onclick="removePhoto(${i})">✕</button>
+          <div class="thumb-num">Foto ${i+1}</div>
+        </div>
+      </div>`;
+
+    const d = document.createElement('div');
+    d.className = 'photo-meta-item';
+    d.innerHTML = `
+      <img class="meta-thumb" src="${p.url}">
+      <div class="meta-fields">
+        <input type="text" placeholder="Título da memória" value="${p.title}" oninput="S.photos[${i}].title=this.value">
+        <div class="field-row">
+          <input type="date" value="${p.date}" oninput="S.photos[${i}].date=this.value">
+          <input type="text" placeholder="Local (ex: Parque Ibirapuera)" value="${p.loc}" oninput="S.photos[${i}].loc=this.value">
+        </div>
+      </div>`;
+    ml.appendChild(d);
+  });
+}
+
+// Drag & drop
+const uz = document.getElementById('upload-zone');
+uz.addEventListener('dragover', e => { e.preventDefault(); uz.classList.add('drag-over'); });
+uz.addEventListener('dragleave', () => uz.classList.remove('drag-over'));
+uz.addEventListener('drop', e => { e.preventDefault(); uz.classList.remove('drag-over'); addPhotos(e.dataTransfer.files); });
+
+// ── MAP ──
+function initMap() {
+  if (S.mapInited) return;
+  S.mapInited = true;
+
+  S.mapInst = L.map('place-map', { center: [-15.8,-47.9], zoom: 4, scrollWheelZoom: false });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© CartoDB', maxZoom: 19
+  }).addTo(S.mapInst);
+  S.markersLayer = L.layerGroup().addTo(S.mapInst);
+
+  // Mapa só para visualização — busca por nome abaixo
+}
+
+async function searchPlaceForm() {
+  const query = document.getElementById('place-search-input').value.trim();
+  if (!query) return;
+
+  const btn = document.querySelector('#p-3 .btn-next[onclick="searchPlaceForm()"]');
+  if (btn) { btn.textContent = '...'; btn.disabled = true; }
+
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5`, {
+      headers: { 'Accept-Language': 'pt-BR,pt;q=0.9' }
+    });
+    const results = await res.json();
+    const container = document.getElementById('place-search-results');
+
+    if (results.length === 0) {
+      container.style.display = 'flex';
+      container.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:8px">Nenhum resultado. Tente outro nome.</p>';
+    } else {
+      container.style.display = 'flex';
+      container.innerHTML = results.map(r => `
+        <div onclick="selectPlaceForm('${r.display_name.replace(/'/g,"\'")}', ${r.lat}, ${r.lon})"
+          style="padding:10px 14px;background:white;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:border-color .15s"
+          onmouseover="this.style.borderColor='#b5604a'" onmouseout="this.style.borderColor='var(--border)'">
+          📍 ${r.display_name}
+        </div>
+      `).join('');
+    }
+  } catch(e) {
+    alert('Erro na busca. Verifique sua conexão.');
+  }
+
+  if (btn) { btn.textContent = 'Buscar'; btn.disabled = false; }
+}
+
+function selectPlaceForm(displayName, lat, lng) {
+  const shortName = displayName.split(',')[0].trim();
+  document.getElementById('place-search-results').style.display = 'none';
+  document.getElementById('place-search-input').value = '';
+
+  // Adiciona o lugar direto
+  S.pendingLL = { lat: parseFloat(lat), lng: parseFloat(lng) };
+  document.getElementById('m-place-name').value = shortName;
+  document.getElementById('m-place-desc').value = '';
+  document.getElementById('modal-place').classList.add('open');
+  setTimeout(() => document.getElementById('m-place-name').focus(), 100);
+
+  // Centraliza o mapa no lugar
+  if (S.mapInst) {
+    S.mapInst.setView([parseFloat(lat), parseFloat(lng)], 12);
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal-place').classList.remove('open');
+  S.pendingLL = null;
+}
+
+function confirmPlace() {
+  const name = document.getElementById('m-place-name').value.trim();
+  if (!name || !S.pendingLL) return;
+  const desc = document.getElementById('m-place-desc').value.trim();
+  S.places.push({ name, desc, lat: S.pendingLL.lat, lng: S.pendingLL.lng });
+  closeModal();
+  renderPlaces();
+}
+
+function removePlace(i) { S.places.splice(i,1); renderPlaces(); }
+
+function renderPlaces() {
+  S.markersLayer.clearLayers();
+  const list = document.getElementById('places-list');
+  list.innerHTML = '';
+
+  S.places.forEach((p, i) => {
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="width:14px;height:14px;background:#b5604a;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,.25)"></div>`,
+      iconSize: [14,14], iconAnchor: [7,7],
+    });
+    L.marker([p.lat, p.lng], { icon })
+      .addTo(S.markersLayer)
+      .bindPopup(`<strong style="font-family:'Playfair Display',serif">${p.name}</strong>${p.desc?`<br><span style="color:#9a857a;font-size:12px">${p.desc}</span>`:''}`, { closeButton: false });
+
+    const el = document.createElement('div');
+    el.className = 'place-item';
+    el.innerHTML = `
+      <div class="place-dot"></div>
+      <div class="place-info">
+        <div class="place-name">${p.name}</div>
+        <div class="place-sub">${p.desc || ''}${p.desc?' · ':''}${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}</div>
+      </div>
+      <button class="place-remove" onclick="removePlace(${i})">Remover</button>`;
+    list.appendChild(el);
+  });
+}
+
+// ── SPOTIFY ──
+function previewSpotify(url) {
+  const el = document.getElementById('spotify-preview');
+  el.classList.toggle('show', !!(url && url.includes('spotify.com/track/')));
+}
+
+// ── PLAN ──
+function choosePlan(p) {
+  S.plan = p;
+  document.getElementById('plan-basic').classList.toggle('selected', p==='basic');
+  document.getElementById('plan-premium').classList.toggle('selected', p==='premium');
+  buildSummary();
+}
+
+// ── SUMMARY ──
+function buildSummary() {
+  const n1 = v('name1') || 'Nome 1', n2 = v('name2') || 'Nome 2';
+  document.getElementById('s-couple').textContent = `${n1} & ${n2}`;
+  document.getElementById('s-photos').textContent = `${S.photos.length} foto${S.photos.length!==1?'s':''}`;
+  document.getElementById('s-places').textContent = `${S.places.length} lugar${S.places.length!==1?'es':''}`;
+  if (S.plan==='premium') {
+    document.getElementById('s-plan').textContent = 'Premium · R$9/mês';
+    document.getElementById('s-total').textContent = 'R$9,00';
+  } else {
+    document.getElementById('s-plan').textContent = 'Básico · R$29';
+    document.getElementById('s-total').textContent = 'R$29,00';
+  }
+}
+
+// ── CARD FORMAT ──
+function fmtCard(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,16);
+  el.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+function fmtExp(el) {
+  let v = el.value.replace(/\D/g,'');
+  if (v.length >= 2) v = v.slice(0,2)+'/'+v.slice(2,4);
+  el.value = v;
+}
+
+// ── FINALIZAR ──
+async function finalizar() {
+  const btn = document.getElementById('pay-btn');
+  btn.textContent = '⏳ Criando álbum...'; btn.disabled = true;
+
+  const API_URL = 'https://nossa-historia-api-production.up.railway.app';
+
+  try {
+    // 1. Registra o álbum na API
+    // Pega o plano selecionado via choosePlan
+    const planCard = document.querySelector('.plan-card.selected');
+    const plan = planCard ? planCard.id.replace('plan-', '') : 'basic';
+    const res = await fetch(`${API_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name1: v('name1'),
+        name2: v('name2'),
+        start_date: v('start-date'),
+        quote: v('quote') || null,
+        owner_email: v('owner-email'),
+        password: v('owner-pass'),
+        music_name: v('music-name') || null,
+        music_artist: v('music-artist') || null,
+        spotify_url: v('spotify-url') || null,
+        plan: plan
+      })
+    });
+
+    let data = await res.json();
+
+    // Se email já existe, faz login para pegar o token
+    if (res.status === 409) {
+      const loginRes = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: v('owner-email'), password: v('owner-pass') })
+      });
+      if (loginRes.ok) {
+        data = await loginRes.json();
+      } else {
+        btn.textContent = '♥ Publicar nossa história';
+        btn.disabled = false;
+        alert('Este e-mail já está cadastrado. Verifique sua senha.');
+        return;
+      }
+    }
+
+    if (res.ok || res.status === 409) {
+      // Salva token localmente
+      localStorage.setItem('nh_token', data.access_token);
+      localStorage.setItem('nh_album', JSON.stringify(data.album));
+
+      // 2. Cria sessão de checkout no Stripe
+      const checkoutRes = await fetch(`${API_URL}/payments/checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${data.access_token}`
+        }
+      });
+      const checkoutData = await checkoutRes.json();
+
+      if (checkoutRes.ok && checkoutData.checkout_url) {
+        window.location.replace(checkoutData.checkout_url);
+      } else {
+        alert('Erro ao gerar pagamento: ' + JSON.stringify(checkoutData));
+      }
+    } else {
+      btn.textContent = '♥ Publicar nossa história';
+      btn.disabled = false;
+      alert(data.detail || 'Erro ao criar álbum. Tente novamente.');
+    }
+  } catch (err) {
+    console.error('Erro no finalizar:', err);
+    alert('Erro: ' + err.message);
+    btn.textContent = '♥ Publicar nossa história';
+    btn.disabled = false;
+  }
+}
+
+// ── COPY / SHARE ──
+function copyUrl() {
+  const url = document.getElementById('album-url').textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copiado ✓'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2500);
+  });
+}
+function shareWpp() {
+  const url = document.getElementById('album-url').textContent;
+  window.open(`https://wa.me/?text=Veja nossa história ♥ https://${url}`, '_blank');
+}
+</script>
+</body>
+</html>

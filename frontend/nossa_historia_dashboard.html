@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nossa História — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f4f1;
+  --surface: #ffffff;
+  --surface2: #fdf9f6;
+  --rose: #b5604a;
+  --rose-light: #d4856f;
+  --rose-pale: #f2e4de;
+  --rose-dark: #8f4535;
+  --gold: #c9a96e;
+  --gold-pale: #faf3e6;
+  --ink: #1e1612;
+  --ink2: #3d2f28;
+  --muted: #9a857a;
+  --border: #ecddd5;
+  --border2: #e0cfc6;
+  --shadow: rgba(30,22,18,0.07);
+  --shadow2: rgba(30,22,18,0.13);
+  --green: #4a7c59;
+  --green-pale: #eaf4ee;
+  --red: #c0392b;
+  --red-pale: #fdecea;
+  --blue: #3a6b8a;
+  --blue-pale: #e8f2f8;
+  --sidebar-w: 240px;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+}
+
+/* ── LOGIN SCREEN ── */
+.login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(145deg, #fdf8f4 0%, #f0e6dc 50%, #e8d8cc 100%);
+  position: relative;
+}
+.login-screen::before {
+  content:'';
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse 60% 60% at 80% 20%, rgba(201,169,110,0.1) 0%, transparent 60%),
+              radial-gradient(ellipse 50% 50% at 20% 80%, rgba(181,96,74,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.login-card {
+  background: white;
+  border-radius: 16px;
+  padding: 48px 40px;
+  width: 100%; max-width: 420px;
+  box-shadow: 0 24px 64px var(--shadow2);
+  position: relative;
+  border: 1px solid var(--border);
+  animation: fadeUp 0.5s ease;
+}
+@keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+.login-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px; font-style: italic;
+  color: var(--rose); text-align: center;
+  margin-bottom: 6px;
+}
+.login-logo span { color: var(--ink); font-style: normal; }
+.login-sub {
+  text-align: center; font-size: 13px;
+  color: var(--muted); margin-bottom: 36px;
+}
+.login-card label {
+  display: block; font-size: 11px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--ink2); margin-bottom: 7px; font-weight: 700;
+}
+.login-card input {
+  width: 100%; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 7px;
+  padding: 13px 16px; font-size: 15px;
+  font-family: 'Lato', sans-serif; font-weight: 300;
+  color: var(--ink); outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  margin-bottom: 18px;
+}
+.login-card input:focus {
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px var(--rose-pale);
+  background: white;
+}
+.login-err {
+  background: var(--red-pale); border: 1px solid rgba(192,57,43,0.2);
+  color: var(--red); border-radius: 7px;
+  padding: 10px 14px; font-size: 13px;
+  margin-bottom: 16px; display: none;
+}
+.login-err.show { display: block; }
+.btn-login {
+  width: 100%; padding: 14px;
+  background: linear-gradient(135deg, var(--rose), var(--rose-light));
+  color: white; border: none; border-radius: 100px;
+  font-size: 15px; font-family: 'Lato', sans-serif;
+  cursor: pointer; transition: all .2s;
+  box-shadow: 0 4px 16px rgba(181,96,74,0.3);
+  letter-spacing: 0.5px;
+}
+.btn-login:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(181,96,74,0.4); }
+.login-hint {
+  text-align: center; font-size: 12px;
+  color: var(--muted); margin-top: 20px;
+  font-style: italic;
+}
+
+/* ── APP LAYOUT ── */
+.app { display: none; min-height: 100vh; }
+.app.show { display: flex; }
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w); background: var(--ink);
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; bottom: 0;
+  z-index: 50; overflow-y: auto;
+}
+.sidebar-logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.sidebar-logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-style: italic;
+  color: var(--rose-light);
+}
+.sidebar-logo-text span { color: rgba(255,255,255,0.7); font-style: normal; }
+.sidebar-album {
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.sidebar-album-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px; color: white; margin-bottom: 2px;
+}
+.sidebar-album-date {
+  font-size: 11px; color: rgba(255,255,255,0.4);
+  font-family: 'DM Mono', monospace;
+}
+.sidebar-nav { padding: 16px 12px; flex: 1; }
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: 8px;
+  cursor: pointer; transition: all .15s;
+  color: rgba(255,255,255,0.5);
+  font-size: 14px; margin-bottom: 2px;
+  user-select: none;
+}
+.nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+.nav-item.active { background: rgba(181,96,74,0.18); color: var(--rose-light); }
+.nav-item.active .nav-icon { color: var(--rose-light); }
+.nav-icon { font-size: 16px; width: 20px; text-align: center; }
+.sidebar-footer {
+  padding: 16px 12px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.btn-view-album {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; width: 100%; padding: 10px;
+  background: rgba(181,96,74,0.15);
+  border: 1px solid rgba(181,96,74,0.25);
+  color: var(--rose-light); border-radius: 8px;
+  cursor: pointer; font-size: 13px; font-family: 'Lato', sans-serif;
+  transition: all .15s; margin-bottom: 8px;
+}
+.btn-view-album:hover { background: rgba(181,96,74,0.25); }
+.btn-logout {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; width: 100%; padding: 10px;
+  background: none; border: none;
+  color: rgba(255,255,255,0.3); border-radius: 8px;
+  cursor: pointer; font-size: 13px; font-family: 'Lato', sans-serif;
+  transition: all .15s;
+}
+.btn-logout:hover { color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.04); }
+
+/* MAIN */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1; min-height: 100vh;
+  display: flex; flex-direction: column;
+}
+.topbar {
+  background: white; border-bottom: 1px solid var(--border);
+  padding: 16px 32px; display: flex;
+  align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 40;
+  box-shadow: 0 1px 8px var(--shadow);
+}
+.topbar-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 400; color: var(--ink);
+}
+.topbar-title em { font-style: italic; color: var(--rose); }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.plan-badge-top {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 1.5px;
+  text-transform: uppercase; padding: 4px 10px;
+  border-radius: 20px; background: var(--gold-pale);
+  color: var(--gold); border: 1px solid rgba(201,169,110,0.3);
+}
+.avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--rose), var(--rose-light));
+  color: white; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+}
+
+/* CONTENT */
+.content { padding: 32px; flex: 1; }
+
+/* PANELS */
+.panel { display: none; animation: fadeUp 0.3s ease; }
+.panel.active { display: block; }
+
+/* ── OVERVIEW ── */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px; margin-bottom: 28px;
+}
+@media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.stat-card {
+  background: white; border: 1px solid var(--border);
+  border-radius: 12px; padding: 22px;
+  transition: box-shadow .2s;
+}
+.stat-card:hover { box-shadow: 0 6px 24px var(--shadow); }
+.stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 10px;
+}
+.stat-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 34px; font-weight: 600; color: var(--ink);
+  line-height: 1;
+}
+.stat-sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.stat-trend {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; margin-top: 6px;
+}
+.trend-up { color: var(--green); }
+.trend-down { color: var(--red); }
+
+.chart-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 28px; }
+@media (max-width: 860px) { .chart-row { grid-template-columns: 1fr; } }
+
+.card {
+  background: white; border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px;
+}
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; font-weight: 400;
+  color: var(--ink); margin-bottom: 4px;
+}
+.card-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+
+/* Bar chart */
+.bar-chart { display: flex; flex-direction: column; gap: 10px; }
+.bar-row { display: flex; align-items: center; gap: 10px; }
+.bar-label { font-size: 12px; color: var(--muted); width: 36px; text-align: right; font-family: 'DM Mono', monospace; }
+.bar-track { flex: 1; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+.bar-fill {
+  height: 100%; border-radius: 4px;
+  background: linear-gradient(90deg, var(--rose), var(--rose-light));
+  transition: width 1s cubic-bezier(.25,.46,.45,.94);
+}
+.bar-val { font-size: 12px; color: var(--ink2); width: 30px; font-family: 'DM Mono', monospace; }
+
+/* Mini donut */
+.donut-wrap { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+.donut { position: relative; width: 120px; height: 120px; }
+.donut svg { transform: rotate(-90deg); }
+.donut-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.donut-num { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 600; color: var(--ink); }
+.donut-lbl { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+.donut-legend { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.legend-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.legend-lbl { display: flex; align-items: center; gap: 8px; color: var(--ink2); }
+.legend-val { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; }
+
+/* Recent activity */
+.activity-list { display: flex; flex-direction: column; }
+.activity-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-icon {
+  width: 34px; height: 34px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.activity-text { flex: 1; }
+.activity-desc { font-size: 14px; color: var(--ink2); line-height: 1.4; }
+.activity-time { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: 'DM Mono', monospace; }
+
+/* ── FOTOS ── */
+.section-actions {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+}
+.section-head { }
+.section-head h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 400; }
+.section-head p { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+.btn { padding: 10px 20px; border-radius: 100px; font-size: 13px; font-family: 'Lato', sans-serif; cursor: pointer; transition: all .2s; border: none; font-weight: 400; letter-spacing: 0.3px; }
+.btn-primary { background: linear-gradient(135deg, var(--rose), var(--rose-light)); color: white; box-shadow: 0 3px 12px rgba(181,96,74,0.25); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(181,96,74,0.35); }
+.btn-secondary { background: white; border: 1px solid var(--border); color: var(--ink2); }
+.btn-secondary:hover { border-color: var(--rose-light); color: var(--rose); }
+.btn-danger { background: var(--red-pale); border: 1px solid rgba(192,57,43,0.2); color: var(--red); }
+.btn-danger:hover { background: rgba(192,57,43,0.15); }
+.btn-sm { padding: 7px 14px; font-size: 12px; }
+
+.photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+}
+.photo-card-edit {
+  background: white; border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden;
+  transition: box-shadow .2s; position: relative;
+}
+.photo-card-edit:hover { box-shadow: 0 6px 20px var(--shadow2); }
+.photo-thumb-edit {
+  aspect-ratio: 1; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; position: relative;
+}
+.photo-thumb-edit img { width:100%; height:100%; object-fit:cover; }
+.photo-card-actions {
+  position: absolute; top: 8px; right: 8px;
+  display: flex; gap: 4px; opacity: 0;
+  transition: opacity .2s;
+}
+.photo-card-edit:hover .photo-card-actions { opacity: 1; }
+.icon-btn {
+  width: 28px; height: 28px; border-radius: 6px;
+  border: none; cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 13px; transition: all .15s;
+}
+.icon-btn-del { background: rgba(192,57,43,0.85); color: white; }
+.icon-btn-del:hover { background: var(--red); }
+.photo-card-info { padding: 10px 12px; }
+.photo-card-title { font-size: 13px; font-weight: 400; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.photo-card-meta { font-size: 11px; color: var(--muted); margin-top: 3px; font-family: 'DM Mono', monospace; }
+
+.upload-zone-sm {
+  border: 2px dashed var(--border); border-radius: 10px;
+  padding: 28px; text-align: center; cursor: pointer;
+  transition: all .2s; background: white;
+  position: relative; margin-bottom: 14px;
+}
+.upload-zone-sm:hover { border-color: var(--rose-light); background: var(--rose-pale); }
+.upload-zone-sm input { position:absolute; inset:0; opacity:0; cursor:pointer; border:none; padding:0; width:100%; height:100%; }
+
+/* ── TEXTOS ── */
+.edit-form { display: flex; flex-direction: column; gap: 20px; max-width: 640px; }
+.edit-form label { display:block; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink2); margin-bottom:7px; font-weight:700; }
+.edit-form input, .edit-form textarea {
+  width:100%; background:var(--bg); border:1px solid var(--border);
+  border-radius:7px; padding:13px 16px; font-size:15px;
+  font-family:'Lato',sans-serif; font-weight:300; color:var(--ink);
+  outline:none; transition:border-color .2s, box-shadow .2s;
+}
+.edit-form input:focus, .edit-form textarea:focus {
+  border-color:var(--rose); box-shadow:0 0 0 3px var(--rose-pale); background:white;
+}
+.edit-form textarea { resize:vertical; min-height:80px; line-height:1.6; }
+.char-count { font-size:11px; color:var(--muted); text-align:right; margin-top:4px; }
+.save-toast {
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+  background:var(--ink); color:white; padding:12px 24px;
+  border-radius:100px; font-size:14px;
+  box-shadow:0 8px 24px var(--shadow2);
+  opacity:0; transition:opacity .3s; pointer-events:none; z-index:200;
+  display:flex; align-items:center; gap:8px;
+}
+.save-toast.show { opacity:1; }
+
+/* ── PLANO ── */
+.plan-section { max-width: 720px; }
+.current-plan-card {
+  background: linear-gradient(135deg, var(--ink) 0%, #3d2f28 100%);
+  border-radius: 14px; padding: 28px;
+  color: white; margin-bottom: 24px;
+  position: relative; overflow: hidden;
+}
+.current-plan-card::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background: radial-gradient(ellipse 60% 80% at 80% 30%, rgba(181,96,74,0.2) 0%, transparent 60%);
+}
+.cp-badge {
+  font-family:'DM Mono',monospace;
+  font-size:10px; letter-spacing:2px;
+  text-transform:uppercase; color:var(--gold-light);
+  margin-bottom:10px; position:relative;
+}
+.cp-name {
+  font-family:'Playfair Display',serif;
+  font-size:28px; margin-bottom:4px; position:relative;
+}
+.cp-price { font-size:14px; color:rgba(255,255,255,0.55); margin-bottom:20px; position:relative; }
+.cp-features {
+  list-style:none; display:flex; flex-direction:column;
+  gap:7px; position:relative;
+}
+.cp-features li { font-size:13px; color:rgba(255,255,255,0.75); display:flex; gap:8px; }
+.cp-features li::before { content:'✦'; font-size:10px; color:var(--rose-light); margin-top:2px; }
+.cp-actions { display:flex; gap:10px; margin-top:20px; position:relative; }
+.btn-cancel-plan {
+  padding:9px 18px; background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.15);
+  color:rgba(255,255,255,0.6); border-radius:100px;
+  cursor:pointer; font-size:13px; font-family:'Lato',sans-serif;
+  transition:all .15s;
+}
+.btn-cancel-plan:hover { background:rgba(255,255,255,0.14); color:white; }
+
+.billing-history { }
+.billing-item {
+  display:flex; align-items:center; gap:14px;
+  padding:14px 0; border-bottom:1px solid var(--border);
+}
+.billing-item:last-child { border-bottom:none; }
+.billing-icon {
+  width:36px; height:36px; border-radius:8px;
+  background:var(--green-pale); color:var(--green);
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; flex-shrink:0;
+}
+.billing-info { flex:1; }
+.billing-desc { font-size:14px; color:var(--ink2); }
+.billing-date { font-size:11px; color:var(--muted); margin-top:2px; font-family:'DM Mono',monospace; }
+.billing-amount { font-family:'Playfair Display',serif; font-size:17px; color:var(--ink); }
+.status-badge {
+  font-size:10px; letter-spacing:1px; text-transform:uppercase;
+  padding:3px 8px; border-radius:3px;
+}
+.status-paid { background:var(--green-pale); color:var(--green); }
+.status-pending { background:var(--gold-pale); color:var(--gold); }
+
+.plan-upgrade-card {
+  background:white; border:1px solid var(--border);
+  border-radius:12px; padding:24px; margin-top:20px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:20px; flex-wrap:wrap;
+}
+.plan-upgrade-text h3 { font-family:'Playfair Display',serif; font-size:18px; margin-bottom:4px; }
+.plan-upgrade-text p { font-size:13px; color:var(--muted); }
+
+/* ── CONFIRM MODAL ── */
+.modal-overlay {
+  position:fixed; inset:0;
+  background:rgba(30,22,18,0.6);
+  z-index:300; display:none;
+  align-items:center; justify-content:center; padding:24px;
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:white; border-radius:14px;
+  padding:32px; width:100%; max-width:400px;
+  animation:fadeUp 0.25s ease;
+}
+.modal h3 { font-family:'Playfair Display',serif; font-size:22px; margin-bottom:8px; }
+.modal p { font-size:14px; color:var(--muted); line-height:1.6; }
+.modal-actions { display:flex; gap:10px; margin-top:24px; justify-content:flex-end; }
+
+/* ── TIMELINE ── */
+.timeline-item {
+  display:flex; gap:16px; padding:16px 0;
+  border-bottom:1px solid var(--border); position:relative;
+}
+.timeline-item:last-child { border-bottom:none; }
+.timeline-dot {
+  width:14px; height:14px; border-radius:50%;
+  background:var(--rose); flex-shrink:0; margin-top:3px;
+  box-shadow:0 0 0 3px var(--rose-pale);
+}
+.timeline-dot-special { background:var(--gold); box-shadow:0 0 0 3px var(--gold-pale); }
+.timeline-body { flex:1; }
+.timeline-title { font-weight:700; font-size:14px; color:var(--ink); }
+.timeline-date { font-size:11px; color:var(--muted); font-family:'DM Mono',monospace; margin-top:2px; }
+.timeline-desc { font-size:13px; color:var(--ink2); margin-top:5px; line-height:1.5; }
+.timeline-del {
+  background:none;border:none;cursor:pointer;color:var(--muted);
+  font-size:16px;padding:4px;margin-left:8px;flex-shrink:0;
+  opacity:0; transition:opacity .2s;
+}
+.timeline-item:hover .timeline-del { opacity:1; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .content { padding: 16px 14px 90px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .chart-row { grid-template-columns: 1fr; }
+  .photos-grid { grid-template-columns: 1fr 1fr; }
+  .topbar { padding: 0 14px; }
+  .bottom-nav { display: flex; }
+}
+
+/* Barra de navegação inferior para mobile */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--ink);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  z-index: 200;
+  padding: 8px 0 env(safe-area-inset-bottom, 8px);
+}
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 4px;
+  cursor: pointer;
+  color: rgba(255,255,255,0.5);
+  font-size: 10px;
+  letter-spacing: 0.3px;
+  transition: color .2s;
+  border: none;
+  background: none;
+  font-family: 'Lato', sans-serif;
+}
+.bottom-nav-item.active { color: var(--rose-light); }
+.bottom-nav-item span:first-child { font-size: 20px; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div class="login-screen" id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">Nossa <span>História</span></div>
+    <p class="login-sub">Acesse o painel do seu álbum</p>
+
+    <div class="login-err" id="login-err">E-mail ou senha incorretos. Tente novamente.</div>
+
+    <label>E-mail</label>
+    <input type="email" id="l-email" placeholder="seuemail@exemplo.com" onkeydown="if(event.key==='Enter')doLogin()">
+
+    <label>Senha</label>
+    <input type="password" id="l-pass" placeholder="Sua senha" onkeydown="if(event.key==='Enter')doLogin()">
+
+    <button class="btn-login" onclick="doLogin()">Entrar no painel</button>
+    <p class="login-hint">Acesse com o e-mail e senha cadastrados no ato da compra.</p>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div class="app" id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-text">Nossa <span>História</span></div>
+    </div>
+    <div class="sidebar-album">
+      <div class="sidebar-album-name" id="sb-album-name">Ana & Lucas</div>
+      <div class="sidebar-album-date" id="sb-album-date">Desde 14 Fev 2021</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" onclick="showPanel('overview',this)">
+        <span class="nav-icon">📊</span> Visão Geral
+      </div>
+      <div class="nav-item" onclick="showPanel('fotos',this)">
+        <span class="nav-icon">📷</span> Fotos
+      </div>
+      <div class="nav-item" onclick="showPanel('textos',this)">
+        <span class="nav-icon">✏️</span> Textos
+      </div>
+      <div class="nav-item" onclick="showPanel('lugares',this)">
+        <span class="nav-icon">📍</span> Lugares
+      </div>
+      <div class="nav-item" onclick="showPanel('timeline',this)">
+        <span class="nav-icon">🗓️</span> Linha do Tempo
+      </div>
+      <div class="nav-item" onclick="showPanel('plano',this)">
+        <span class="nav-icon">💳</span> Plano & Pagamento
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-view-album" onclick="abrirAlbum()">↗ Ver álbum publicado</button>
+      <button class="btn-logout" onclick="logout()">← Sair</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Visão <em>Geral</em></div>
+      <div class="topbar-right">
+        <span class="plan-badge-top">✦ Premium</span>
+        <div class="avatar" id="user-avatar">A</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── OVERVIEW ── -->
+      <div class="panel active" id="panel-overview">
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Visitas totais</div>
+            <div class="stat-value" id="stat-visits">0</div>
+            <div class="stat-trend" id="stat-trend" style="color:var(--muted);font-size:12px">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Dias juntos</div>
+            <div class="stat-value" id="stat-days">0</div>
+            <div class="stat-sub" id="stat-since">calculando...</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Fotos</div>
+            <div class="stat-value" id="stat-photos">0</div>
+            <div class="stat-sub">no álbum de vocês</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Lugares</div>
+            <div class="stat-value" id="stat-places">0</div>
+            <div class="stat-sub">no mapa de vocês</div>
+          </div>
+        </div>
+
+        <div class="chart-row">
+          <div class="card">
+            <div class="card-title">Visitas por dia</div>
+            <div class="card-sub">Últimos 7 dias</div>
+            <div class="bar-chart" id="visits-chart"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">De onde acessam</div>
+            <div class="card-sub">Dispositivos</div>
+            <div class="donut-wrap">
+              <div class="donut">
+                <svg width="120" height="120" viewBox="0 0 120 120" id="donut-svg">
+                  <circle cx="60" cy="60" r="46" fill="none" stroke="#f0e8e2" stroke-width="14"/>
+                  <circle id="donut-arc-mobile" cx="60" cy="60" r="46" fill="none" stroke="#b5604a" stroke-width="14"
+                    stroke-dasharray="0 289" stroke-linecap="round"/>
+                  <circle id="donut-arc-desktop" cx="60" cy="60" r="46" fill="none" stroke="#c9a96e" stroke-width="14"
+                    stroke-dasharray="0 289" stroke-dashoffset="0" stroke-linecap="round"/>
+                </svg>
+                <div class="donut-center">
+                  <div class="donut-num" id="donut-visits">0</div>
+                  <div class="donut-lbl">visitas</div>
+                </div>
+              </div>
+              <div class="donut-legend">
+                <div class="legend-row">
+                  <div class="legend-lbl"><div class="legend-dot" style="background:var(--rose)"></div>Mobile</div>
+                  <div class="legend-val" id="legend-mobile">—</div>
+                </div>
+                <div class="legend-row">
+                  <div class="legend-lbl"><div class="legend-dot" style="background:var(--gold)"></div>Desktop</div>
+                  <div class="legend-val" id="legend-desktop">—</div>
+                </div>
+                <div class="legend-row">
+                  <div class="legend-lbl"><div class="legend-dot" style="background:#e0cfc6"></div>Tablet</div>
+                  <div class="legend-val" id="legend-tablet">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Atividade recente</div>
+          <div class="card-sub">O que aconteceu no seu álbum</div>
+          <div class="activity-list" id="activity-list">
+            <div style="color:var(--muted);font-style:italic;font-size:13px;padding:12px 0">Carregando atividade...</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── FOTOS ── -->
+      <div class="panel" id="panel-fotos">
+        <div class="section-actions">
+          <div class="section-head">
+            <h2>Fotos do álbum</h2>
+            <p>Gerencie as memórias de vocês</p>
+          </div>
+          <button class="btn btn-primary" onclick="document.getElementById('add-photo-input').click()">
+            + Adicionar fotos
+          </button>
+        </div>
+
+        <div class="upload-zone-sm" onclick="document.getElementById('add-photo-input').click()">
+          <input type="file" id="add-photo-input" multiple accept="image/*" onchange="addNewPhotos(this.files)">
+          📷 Clique ou arraste para adicionar novas fotos
+        </div>
+
+        <div class="photos-grid" id="photos-grid"></div>
+      </div>
+
+      <!-- ── TEXTOS ── -->
+      <div class="panel" id="panel-textos">
+        <div class="section-actions">
+          <div class="section-head">
+            <h2>Textos do álbum</h2>
+            <p>Edite os textos que aparecem na página de vocês</p>
+          </div>
+          <button class="btn btn-primary" onclick="saveTexts()">Salvar alterações</button>
+        </div>
+
+        <div class="edit-form">
+          <div>
+            <label>Nomes do casal</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <input type="text" id="edit-name1" value="Ana" oninput="updateSbName()">
+              <input type="text" id="edit-name2" value="Lucas" oninput="updateSbName()">
+            </div>
+          </div>
+
+          <div>
+            <label>Data de início do relacionamento</label>
+            <input type="date" id="edit-date" value="2021-02-14">
+            <div style="font-size:12px;color:var(--muted);margin-top:5px;font-style:italic">Isso atualiza o contador de dias automaticamente.</div>
+          </div>
+
+          <div>
+            <label>Frase especial do casal</label>
+            <textarea id="edit-quote" rows="3" maxlength="200" oninput="countChars('edit-quote','qc')">Em cada olhar, a certeza de que você é o meu lar.</textarea>
+            <div class="char-count"><span id="qc">51</span>/200</div>
+          </div>
+
+          <div>
+            <label>Nome da música do casal</label>
+            <input type="text" id="edit-music-name" value="Perfect">
+          </div>
+
+          <div>
+            <label>Artista</label>
+            <input type="text" id="edit-music-artist" value="Ed Sheeran">
+          </div>
+
+          <div>
+            <label>Frase da letra</label>
+            <textarea id="edit-music-quote" rows="2" maxlength="150" oninput="countChars('edit-music-quote','mqc')">"I found a love for me... darling just dive right in, and follow my lead"</textarea>
+            <div class="char-count"><span id="mqc">70</span>/150</div>
+          </div>
+
+          <div id="spotify-field-wrapper">
+            <label>Link do Spotify <span id="spotify-premium-badge" style="display:none;font-size:10px;background:var(--gold-pale);color:var(--gold);padding:2px 6px;border-radius:4px;margin-left:4px;vertical-align:middle">⭐ Premium</span></label>
+            <input type="url" id="edit-spotify" placeholder="https://open.spotify.com/track...">
+            <div id="spotify-lock-msg" style="display:none;font-size:12px;color:var(--muted);margin-top:4px">🔒 Disponível apenas no plano Premium. <a href="#" onclick="showPanel('plano',document.querySelector('.nav-item:last-child'));return false" style="color:var(--rose)">Fazer upgrade</a></div>
+          </div>
+
+          <div style="padding-top:8px">
+            <button class="btn btn-primary" onclick="saveTexts()" style="width:100%">Salvar todas as alterações</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── LUGARES ── -->
+      <div class="panel" id="panel-lugares">
+        <div class="section-actions">
+          <div class="section-head">
+            <h2>Lugares especiais</h2>
+            <p>Os lugares que marcaram a história de vocês</p>
+          </div>
+        </div>
+
+        <div class="edit-form">
+          <div>
+            <label>Buscar lugar</label>
+            <div style="display:flex;gap:10px">
+              <input type="text" id="place-search" placeholder="Ex: Copacabana, Rio de Janeiro" style="flex:1" onkeydown="if(event.key==='Enter') searchPlace()">
+              <button class="btn btn-primary" onclick="searchPlace()">Buscar</button>
+            </div>
+          </div>
+
+          <div id="place-results" style="display:none">
+            <label>Resultados</label>
+            <div id="place-results-list" style="display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto"></div>
+          </div>
+
+          <div id="place-form" style="display:none">
+            <label>Nome do lugar</label>
+            <input type="text" id="place-name" placeholder="Ex: Primeiro encontro em Copacabana">
+            <label style="margin-top:12px">Descrição (opcional)</label>
+            <input type="text" id="place-desc" placeholder="O que aconteceu aqui?">
+            <input type="hidden" id="place-lat">
+            <input type="hidden" id="place-lng">
+            <button class="btn btn-primary" onclick="savePlace()" style="margin-top:14px;width:100%">+ Adicionar lugar</button>
+          </div>
+        </div>
+
+        <div id="places-list" style="display:flex;flex-direction:column;gap:10px;margin-top:20px"></div>
+      </div>
+
+      <!-- ── LINHA DO TEMPO ── -->
+      <div class="panel" id="panel-timeline">
+        <div class="section-actions">
+          <div class="section-head">
+            <h2>Linha do Tempo</h2>
+            <p>Os momentos mais importantes da história de vocês</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('timeline-modal')">+ Adicionar evento</button>
+        </div>
+
+        <div id="timeline-list" style="margin-top:20px;display:flex;flex-direction:column;gap:0">
+          <div style="color:var(--muted);font-style:italic;font-size:13px;padding:20px 0;text-align:center">Carregando...</div>
+        </div>
+      </div>
+
+      <!-- ── PLANO ── -->
+      <div class="panel" id="panel-plano">
+        <div class="section-head" style="margin-bottom:24px">
+          <h2>Plano & Pagamento</h2>
+          <p>Gerencie sua assinatura e histórico de pagamentos</p>
+        </div>
+
+        <!-- PDF Export -->
+        <div class="card" style="margin-bottom:24px;padding:24px">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+            <div>
+              <div style="font-size:16px;font-weight:700;margin-bottom:6px">📄 Exportar álbum em PDF</div>
+              <div style="font-size:13px;color:var(--muted)">Gere um livro de memórias para imprimir ou guardar</div>
+            </div>
+            <button class="btn btn-primary" onclick="if(checkPlanForFeature('pdf')) gerarPDF()" id="btn-pdf">
+              ⬇ Baixar PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="plan-section" id="plan-section-dynamic">
+          <!-- Conteúdo dinâmico injetado por renderPlanPanel() -->
+          <div style="color:var(--muted);font-style:italic;font-size:13px;padding:20px 0">Carregando plano...</div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div><!-- /app -->
+
+<!-- MODAL: confirmar cancelamento -->
+<!-- Modal de detalhes da foto -->
+<!-- ── BOTTOM NAV MOBILE ── -->
+<nav class="bottom-nav">
+  <button class="bottom-nav-item active" onclick="showPanelMobile('overview', this)"><span>📊</span><span>Geral</span></button>
+  <button class="bottom-nav-item" onclick="showPanelMobile('fotos', this)"><span>📷</span><span>Fotos</span></button>
+  <button class="bottom-nav-item" onclick="showPanelMobile('lugares', this)"><span>📍</span><span>Lugares</span></button>
+  <button class="bottom-nav-item" onclick="showPanelMobile('timeline', this)"><span>🗓️</span><span>Timeline</span></button>
+  <button class="bottom-nav-item" onclick="showPanelMobile('plano', this)"><span>💳</span><span>Plano</span></button>
+</nav>
+
+<div class="modal-overlay" id="photo-modal">
+  <div class="modal" style="max-width:480px;width:90%">
+    <h3>Detalhes da memória</h3>
+    <div id="photo-preview" style="width:100%;height:180px;background:var(--cream);border-radius:10px;margin:16px 0;background-size:cover;background-position:center;background-repeat:no-repeat"></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:4px">Título da memória</label>
+        <input type="text" id="photo-title" placeholder="Ex: Primeiro encontro" style="width:100%">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:4px">Data</label>
+          <input type="date" id="photo-date" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:4px">Local</label>
+          <input type="text" id="photo-location" placeholder="Ex: São Paulo, SP" style="width:100%">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:4px">Descrição <span style="opacity:0.6">(opcional)</span></label>
+        <textarea id="photo-desc" rows="2" placeholder="Conte um pouco sobre esse momento..." style="width:100%;resize:none"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('photo-modal')">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="confirmarFoto()">Salvar memória ♥</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="cancel-modal">
+  <div class="modal">
+    <h3>Cancelar assinatura?</h3>
+    <p>Você perderá acesso ao Spotify, temas exclusivos e exportação em PDF. Seu álbum continuará no ar, mas com recursos básicos.</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('cancel-modal')">Manter Premium</button>
+      <button class="btn btn-danger btn-sm" onclick="closeModal('cancel-modal');showToast('Para cancelar, acesse o portal do Stripe ou entre em contato: suporte@nossahistoria.com')">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<!-- MODAL TIMELINE -->
+<div class="modal-overlay" id="timeline-modal">
+  <div class="modal" style="max-width:460px">
+    <h3>Adicionar evento</h3>
+    <p style="margin-bottom:20px">Registre um momento especial na linha do tempo de vocês.</p>
+    <div class="edit-form" style="margin-bottom:0">
+      <label>Título do evento *</label>
+      <input type="text" id="tl-title" placeholder="Ex: Primeiro encontro, Nossa viagem...">
+      <label>Data *</label>
+      <input type="date" id="tl-date">
+      <label>Descrição (opcional)</label>
+      <textarea id="tl-desc" rows="2" placeholder="Conte um pouco sobre esse momento..."></textarea>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <input type="checkbox" id="tl-special" style="width:auto;margin:0">
+        <label style="margin:0;cursor:pointer;text-transform:none;letter-spacing:0;font-size:13px;font-weight:400">Marcar como momento especial ⭐</label>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('timeline-modal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTimelineEvent()">Salvar evento ♥</button>
+    </div>
+  </div>
+</div>
+
+<div class="save-toast" id="toast">
+  <span id="toast-icon">✓</span>
+  <span id="toast-msg">Salvo com sucesso!</span>
+</div>
+
+<script>
+// ── LOGIN ──
+const API_URL = 'https://nossa-historia-api-production.up.railway.app';
+
+// Auto-login se tiver token salvo
+window.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('nh_token');
+  const album = localStorage.getItem('nh_album');
+  if (token && album) {
+    try {
+      const a = JSON.parse(album);
+      document.getElementById('user-avatar').textContent = a.owner_email[0].toUpperCase();
+      document.getElementById('sb-album-name').textContent = `${a.name1} & ${a.name2}`;
+      const startDate = new Date(a.start_date);
+      document.getElementById('sb-album-date').textContent = 'Desde ' + startDate.toLocaleDateString('pt-BR', {day:'2-digit', month:'short', year:'numeric'});
+      window._albumStartDate = a.start_date;
+      window._albumSlug = a.slug;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').classList.add('show');
+      initDashboard();
+    } catch(e) {
+      localStorage.removeItem('nh_token');
+      localStorage.removeItem('nh_album');
+    }
+  }
+});
+
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  const err   = document.getElementById('login-err');
+  const btn   = document.querySelector('.btn-login');
+
+  if (!email.includes('@') || pass.length < 8) {
+    err.classList.add('show'); return;
+  }
+  err.classList.remove('show');
+  btn.textContent = 'Entrando...'; btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pass })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      localStorage.setItem('nh_token', data.access_token);
+      localStorage.setItem('nh_album', JSON.stringify(data.album));
+
+      // Preenche dados reais do álbum
+      const a = data.album;
+      document.getElementById('user-avatar').textContent = email[0].toUpperCase();
+      document.getElementById('sb-album-name').textContent = `${a.name1} & ${a.name2}`;
+      const startDate = new Date(a.start_date);
+      document.getElementById('sb-album-date').textContent = 'Desde ' + startDate.toLocaleDateString('pt-BR', {day:'2-digit', month:'short', year:'numeric'});
+      // Salva data para usar no contador
+      window._albumStartDate = a.start_date;
+      window._albumSlug = a.slug;
+
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').classList.add('show');
+      initDashboard();
+    } else {
+      err.textContent = data.detail || 'E-mail ou senha incorretos.';
+      err.classList.add('show');
+      btn.textContent = 'Entrar no painel'; btn.disabled = false;
+    }
+  } catch(e) {
+    // Fallback: login demo se API offline
+    document.getElementById('user-avatar').textContent = email[0].toUpperCase();
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').classList.add('show');
+    initDashboard();
+    btn.textContent = 'Entrar no painel'; btn.disabled = false;
+  }
+}
+
+function abrirAlbum() {
+  const album = JSON.parse(localStorage.getItem('nh_album') || '{}');
+  const slug = album.slug || window._albumSlug;
+  if (slug) {
+    window.open(`nossa_historia_album.html?slug=${slug}`, '_blank');
+  } else {
+    alert('Slug do álbum não encontrado.');
+  }
+}
+
+function logout() {
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('l-email').value = '';
+  document.getElementById('l-pass').value = '';
+}
+
+// ── INIT ──
+function initDashboard() {
+  // Preenche campos com dados reais do album
+  const albumStr = localStorage.getItem('nh_album');
+  if (albumStr) {
+    try {
+      const a = JSON.parse(albumStr);
+      if (document.getElementById('edit-name1')) document.getElementById('edit-name1').value = a.name1 || '';
+      if (document.getElementById('edit-name2')) document.getElementById('edit-name2').value = a.name2 || '';
+      if (document.getElementById('edit-date')) document.getElementById('edit-date').value = a.start_date || '';
+      if (document.getElementById('edit-quote')) document.getElementById('edit-quote').value = a.quote || '';
+      if (document.getElementById('edit-music-name')) document.getElementById('edit-music-name').value = a.music_name || '';
+      if (document.getElementById('edit-music-artist')) document.getElementById('edit-music-artist').value = a.music_artist || '';
+      if (document.getElementById('edit-spotify')) document.getElementById('edit-spotify').value = a.spotify_url || '';
+      // Atualiza badge do plano e restrições de features
+      const isPremium = a.plan === 'premium';
+      const planBadge = document.getElementById('plan-badge-top');
+      if (planBadge) {
+        planBadge.textContent = isPremium ? '✦ Premium' : '● Básico';
+        planBadge.style.display = '';
+        planBadge.style.background = isPremium ? 'var(--gold-pale)' : 'var(--bg)';
+        planBadge.style.color = isPremium ? 'var(--gold)' : 'var(--muted)';
+        planBadge.style.border = isPremium ? 'none' : '1px solid var(--border)';
+      }
+      // Spotify: só Premium
+      const spotifyBadge = document.getElementById('spotify-premium-badge');
+      const spotifyLock = document.getElementById('spotify-lock-msg');
+      const spotifyInput = document.getElementById('edit-spotify');
+      if (!isPremium) {
+        if (spotifyBadge) spotifyBadge.style.display = 'inline';
+        if (spotifyLock) spotifyLock.style.display = 'block';
+        if (spotifyInput) { spotifyInput.disabled = true; spotifyInput.style.opacity = '0.5'; }
+      }
+    } catch(e) {}
+  }
+  updateDayCounter();
+  buildChart();
+  buildPhotosGrid();
+  fetchAlbumStats();
+  loadPlaces();
+  loadTimeline();
+  renderPlanPanel();
+}
+
+// ── COUNTER ──
+function updateDayCounter() {
+  const startStr = window._albumStartDate || localStorage.getItem('nh_album') 
+    ? JSON.parse(localStorage.getItem('nh_album') || '{}').start_date 
+    : '2024-01-01';
+  const start = new Date(startStr || '2024-01-01');
+  const now = new Date();
+  const days = Math.floor((now - start) / 864e5);
+  animateNum('stat-days', days < 0 ? 0 : days, 1200);
+  animateNum('stat-visits', 0, 1400);
+  animateNum('stat-photos', 0, 800);
+  animateNum('stat-places', 0, 800);
+  
+  // Mostra a data de início correta
+  const sinceel = document.getElementById('stat-since');
+  if (sinceel) {
+    sinceel.textContent = 'desde ' + start.toLocaleDateString('pt-BR', {day:'2-digit', month:'short', year:'numeric'});
+  }
+}
+
+function animateNum(id, target, dur) {
+  const el = document.getElementById(id);
+  const start = Date.now();
+  const tick = () => {
+    const p = Math.min((Date.now()-start)/dur, 1);
+    const ease = 1 - Math.pow(1-p, 3);
+    el.textContent = Math.round(ease * target).toLocaleString('pt-BR');
+    if (p < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+// ── BUSCAR DADOS DA API ──
+async function fetchAlbumStats() {
+  const token = localStorage.getItem('nh_token');
+  if (!token) return;
+
+  try {
+    // Busca analytics
+    const analyticsRes = await fetch(`${API_URL}/analytics/me/summary`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (analyticsRes.ok) {
+      const data = await analyticsRes.json();
+      animateNum('stat-visits', data.total_views || 0, 1200);
+      const donut = document.getElementById('donut-visits');
+      if (donut) donut.textContent = (data.total_views || 0).toLocaleString('pt-BR');
+
+      // Atualiza variação semanal
+      const trendEl = document.getElementById('stat-trend');
+      if (trendEl && data.week_change_pct !== undefined) {
+        const pct = data.week_change_pct;
+        if (pct === 0 && data.week_views === 0) {
+          trendEl.textContent = 'nenhuma visita esta semana';
+          trendEl.style.color = 'var(--muted)';
+        } else if (pct === 0) {
+          trendEl.textContent = `${data.week_views} visita${data.week_views !== 1 ? 's' : ''} esta semana`;
+          trendEl.style.color = 'var(--muted)';
+        } else if (pct > 0) {
+          trendEl.textContent = `▲ ${pct}% vs semana passada`;
+          trendEl.style.color = 'var(--green)';
+        } else {
+          trendEl.textContent = `▼ ${Math.abs(pct)}% vs semana passada`;
+          trendEl.style.color = 'var(--red)';
+        }
+      }
+
+      // Atualiza gráfico de dias com dados reais se disponível
+      if (data.daily_views && data.daily_views.length > 0) {
+        buildChart(data.daily_views);
+      }
+
+      // Atualiza dispositivos com dados reais
+      const total = data.total_views || 0;
+      const mobile = data.mobile_views || 0;
+      const desktop = data.desktop_views || 0;
+      const tablet = data.tablet_views || 0;
+      if (total > 0) {
+        const circ = 2 * Math.PI * 46; // ~289
+        const mPct = mobile / total;
+        const dPct = desktop / total;
+        const mArc = circ * mPct;
+        const dArc = circ * dPct;
+        const arcMobile = document.getElementById('donut-arc-mobile');
+        const arcDesktop = document.getElementById('donut-arc-desktop');
+        if (arcMobile) {
+          arcMobile.setAttribute('stroke-dasharray', `${mArc.toFixed(1)} ${(circ - mArc).toFixed(1)}`);
+        }
+        if (arcDesktop) {
+          arcDesktop.setAttribute('stroke-dasharray', `${dArc.toFixed(1)} ${(circ - dArc).toFixed(1)}`);
+          arcDesktop.setAttribute('stroke-dashoffset', `-${mArc.toFixed(1)}`);
+        }
+        const lM = document.getElementById('legend-mobile');
+        const lD = document.getElementById('legend-desktop');
+        const lT = document.getElementById('legend-tablet');
+        if (lM) lM.textContent = Math.round(mPct * 100) + '%';
+        if (lD) lD.textContent = Math.round(dPct * 100) + '%';
+        if (lT) lT.textContent = Math.round((tablet / total) * 100) + '%';
+      } else {
+        ['legend-mobile','legend-desktop','legend-tablet'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = '0%';
+        });
+      }
+
+      // Atividade recente: monta com dados reais
+      buildActivity(data);
+    }
+
+    // Busca lugares
+    const placesRes = await fetch(`${API_URL}/places/`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (placesRes.ok) {
+      const places = await placesRes.json();
+      animateNum('stat-places', places.length || 0, 800);
+    }
+  } catch(e) {
+    console.log('Erro ao buscar stats:', e);
+  }
+}
+
+function buildActivity(data) {
+  const list = document.getElementById('activity-list');
+  if (!list) return;
+  const items = [];
+
+  if (data.total_views > 0) {
+    items.push({
+      icon:'👁️', bg:'var(--blue-pale)',
+      desc:`${data.total_views} ${data.total_views === 1 ? 'visita' : 'visitas'} no álbum de vocês`,
+      time: 'total acumulado'
+    });
+  }
+  if (data.today_views > 0) {
+    items.push({
+      icon:'🔥', bg:'var(--rose-pale)',
+      desc:`${data.today_views} ${data.today_views === 1 ? 'visita' : 'visitas'} hoje`,
+      time: new Date().toLocaleDateString('pt-BR')
+    });
+  }
+  if (data.week_views > 0) {
+    items.push({
+      icon:'📈', bg:'var(--green-pale)',
+      desc:`${data.week_views} visitas nos últimos 7 dias`,
+      time: 'esta semana'
+    });
+  }
+
+  if (items.length === 0) {
+    list.innerHTML = '<p style="color:var(--muted);font-style:italic;font-size:13px;padding:12px 0">Nenhuma visita registrada ainda. Compartilhe seu álbum! ♥</p>';
+    return;
+  }
+
+  list.innerHTML = items.map(it => `
+    <div class="activity-item">
+      <div class="activity-icon" style="background:${it.bg}">${it.icon}</div>
+      <div class="activity-text">
+        <div class="activity-desc">${it.desc}</div>
+        <div class="activity-time">${it.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── CHART ──
+function buildChart(realData) {
+  const data = realData || [
+    {day:'Seg', v:0}, {day:'Ter', v:0}, {day:'Qua', v:0},
+    {day:'Qui', v:0}, {day:'Sex', v:0}, {day:'Sáb', v:0}, {day:'Dom', v:0}
+  ];
+  const max = Math.max(...data.map(d=>d.v));
+  const chart = document.getElementById('visits-chart');
+  chart.innerHTML = data.map(d => `
+    <div class="bar-row">
+      <div class="bar-label">${d.day}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:0%" data-w="${Math.round(d.v/max*100)}%"></div>
+      </div>
+      <div class="bar-val">${d.v}</div>
+    </div>
+  `).join('');
+  setTimeout(() => {
+    chart.querySelectorAll('.bar-fill').forEach(b => { b.style.width = b.dataset.w; });
+  }, 300);
+}
+
+// ── PHOTOS ──
+const PHOTOS = [
+  { id:1, emoji:'🌅', bg:'linear-gradient(135deg,#f5cfc4,#d4786a)', title:'Primeiro Encontro', date:'14 Fev 2021', loc:'Parque Ibirapuera' },
+  { id:2, emoji:'🌊', bg:'linear-gradient(135deg,#fde8d8,#e8a07a)', title:'Litoral', date:'Jul 2021', loc:'Ubatuba' },
+  { id:3, emoji:'🌃', bg:'linear-gradient(135deg,#dce8f5,#7aa8d4)', title:'Réveillon', date:'Jan 2022', loc:'Rio de Janeiro' },
+  { id:4, emoji:'🍂', bg:'linear-gradient(135deg,#f5ead8,#d4b578)', title:'Outono', date:'Abr 2022', loc:'Gramado' },
+  { id:5, emoji:'🌸', bg:'linear-gradient(135deg,#e8d5f0,#a878c8)', title:'Primavera', date:'Set 2022', loc:'Campos do Jordão' },
+  { id:6, emoji:'🏔️', bg:'linear-gradient(135deg,#d8f0e8,#78c0a0)', title:'Trilha', date:'Jan 2023', loc:'Petrópolis' },
+  { id:7, emoji:'🎂', bg:'linear-gradient(135deg,#f8e8d0,#e0a870)', title:'2 Anos', date:'Fev 2023', loc:'São Paulo' },
+  { id:8, emoji:'✈️', bg:'linear-gradient(135deg,#f5d8d8,#d88888)', title:'Lisboa', date:'Jun 2023', loc:'Portugal' },
+];
+
+// ── CLOUDINARY CONFIG ──
+const CLOUDINARY_CLOUD = 'duknkjihr';
+const CLOUDINARY_PRESET = 'nossa-historia';
+
+// Fotos reais carregadas da API
+let REAL_PHOTOS = [];
+
+async function buildPhotosGrid() {
+  const token = localStorage.getItem('nh_token');
+  if (!token) { renderPhotos([]); return; }
+  try {
+    const res = await fetch(`${API_URL}/memories/`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.ok) {
+      REAL_PHOTOS = await res.json();
+      renderPhotos(REAL_PHOTOS);
+      // Atualiza contador de fotos
+      animateNum('stat-photos', REAL_PHOTOS.length, 600);
+    }
+  } catch(e) {
+    renderPhotos([]);
+  }
+}
+
+function renderPhotos(photos) {
+  const grid = document.getElementById('photos-grid');
+  if (!photos || photos.length === 0) {
+    grid.innerHTML = '<p style="color:var(--muted);font-style:italic;grid-column:1/-1;text-align:center;padding:20px">Nenhuma foto adicionada ainda ♥</p>';
+    return;
+  }
+  grid.innerHTML = photos.map(p => `
+    <div class="photo-card-edit" id="pc-${p.id}">
+      <div class="photo-thumb-edit" style="background:${p.photo_url ? 'none' : 'linear-gradient(135deg,#f5efe8,#e8ddd5)'}; background-image:${p.photo_url ? `url(${p.photo_url})` : 'none'}; background-size:cover; background-position:center;">
+        ${!p.photo_url ? '<span>📷</span>' : ''}
+        <div class="photo-card-actions">
+          <button class="icon-btn icon-btn-del" onclick="deletePhotoReal('${p.id}')" title="Remover">✕</button>
+        </div>
+      </div>
+      <div class="photo-card-info">
+        <div class="photo-card-title">${p.title || 'Memória'}</div>
+        <div class="photo-card-meta">${p.memory_date || ''} · ${p.location_name || ''}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function deletePhotoReal(id) {
+  const token = localStorage.getItem('nh_token');
+  if (!token) return;
+  const el = document.getElementById(`pc-${id}`);
+  if (el) { el.style.opacity='0'; el.style.transition='all .25s'; }
+  try {
+    await fetch(`${API_URL}/memories/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    showToast('Foto removida do álbum.');
+    await buildPhotosGrid();
+  } catch(e) {
+    showToast('Erro ao remover foto.');
+  }
+}
+
+// Arquivo pendente para upload
+let _pendingFile = null;
+let _pendingFiles = [];
+let _pendingIndex = 0;
+
+async function addNewPhotos(files) {
+  const token = localStorage.getItem('nh_token');
+  if (!token) { showToast('Faça login para adicionar fotos.'); return; }
+
+  _pendingFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+  _pendingIndex = 0;
+
+  if (_pendingFiles.length === 0) return;
+  abrirModalFoto(_pendingFiles[0]);
+}
+
+function abrirModalFoto(file) {
+  _pendingFile = file;
+
+  // Preview da imagem
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('photo-preview').style.backgroundImage = `url(${e.target.result})`;
+  };
+  reader.readAsDataURL(file);
+
+  // Preenche título com nome do arquivo
+  document.getElementById('photo-title').value = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+  document.getElementById('photo-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('photo-location').value = '';
+  document.getElementById('photo-desc').value = '';
+
+  openModal('photo-modal');
+}
+
+async function confirmarFoto() {
+  const token = localStorage.getItem('nh_token');
+  const title = document.getElementById('photo-title').value.trim() || 'Memória';
+  const date = document.getElementById('photo-date').value;
+  const location = document.getElementById('photo-location').value.trim();
+  const desc = document.getElementById('photo-desc').value.trim();
+
+  const btn = document.querySelector('#photo-modal .btn-primary');
+  btn.textContent = '⏳ Enviando...'; btn.disabled = true;
+
+  try {
+    // 1. Upload para Cloudinary
+    const formData = new FormData();
+    formData.append('file', _pendingFile);
+    formData.append('upload_preset', CLOUDINARY_PRESET);
+
+    const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+      method: 'POST',
+      body: formData
+    });
+    const uploadData = await uploadRes.json();
+    const photoUrl = uploadData.secure_url;
+
+    // 2. Salva na API
+    const memoryRes = await fetch(`${API_URL}/memories/`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        photo_url: photoUrl,
+        memory_date: date || null,
+        location_name: location || null,
+        description: desc || null,
+        display_order: REAL_PHOTOS.length
+      })
+    });
+
+    if (!memoryRes.ok) throw new Error('Erro ao salvar');
+
+    closeModal('photo-modal');
+    showToast('Memória salva! ♥');
+    await buildPhotosGrid();
+
+    // Próxima foto se houver
+    _pendingIndex++;
+    if (_pendingIndex < _pendingFiles.length) {
+      setTimeout(() => abrirModalFoto(_pendingFiles[_pendingIndex]), 300);
+    }
+
+  } catch(e) {
+    console.error('Erro:', e);
+    showToast('Erro ao enviar foto. Tente novamente.');
+  }
+
+  btn.textContent = 'Salvar memória ♥'; btn.disabled = false;
+}
+
+// ── TEXTOS ──
+function countChars(inputId, countId) {
+  const el = document.getElementById(inputId);
+  document.getElementById(countId).textContent = el.value.length;
+}
+
+async function saveTexts() {
+  const n1 = document.getElementById('edit-name1').value.trim();
+  const n2 = document.getElementById('edit-name2').value.trim();
+  const token = localStorage.getItem('nh_token');
+
+  if (n1 && n2) {
+    document.getElementById('sb-album-name').textContent = `${n1} & ${n2}`;
+  }
+
+  if (token) {
+    try {
+      const res = await fetch(`${API_URL}/albums/me/profile`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name1: n1,
+          name2: n2,
+          start_date: document.getElementById('edit-date').value,
+          quote: document.getElementById('edit-quote').value,
+          music_name: document.getElementById('edit-music-name').value,
+          music_artist: document.getElementById('edit-music-artist').value,
+          spotify_url: document.getElementById('edit-spotify').value || null,
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem('nh_album', JSON.stringify(data));
+        showToast('✓ Alterações salvas com sucesso!');
+      } else {
+        showToast('Erro ao salvar. Tente novamente.');
+      }
+    } catch(e) {
+      showToast('✓ Salvo localmente.');
+    }
+  } else {
+    showToast('✓ Alterações salvas com sucesso!');
+  }
+}
+
+function updateSbName() {
+  const n1 = document.getElementById('edit-name1').value || 'Nome 1';
+  const n2 = document.getElementById('edit-name2').value || 'Nome 2';
+  document.getElementById('sb-album-name').textContent = `${n1} & ${n2}`;
+}
+
+// ── NAVIGATION ──
+const panelTitles = {
+  overview: 'Visão <em>Geral</em>',
+  lugares: 'Lugares <em>Especiais</em>',
+  fotos: 'Fotos do <em>Álbum</em>',
+  textos: 'Editar <em>Textos</em>',
+  timeline: 'Linha do <em>Tempo</em>',
+  plano: 'Plano & <em>Pagamento</em>',
+};
+
+function showPanelMobile(name, btn) {
+  // Atualiza bottom nav
+  document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Mostra o painel
+  showPanel(name, btn);
+}
+
+function showPanel(name, navEl) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  navEl.classList.add('active');
+  document.getElementById('topbar-title').innerHTML = panelTitles[name];
+}
+
+// ── MODALS ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── CLICKS OUTSIDE MODAL ──
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ── LUGARES ──
+async function loadPlaces() {
+  const token = localStorage.getItem('nh_token');
+  if (!token) return;
+  try {
+    const res = await fetch(`${API_URL}/places/`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.ok) {
+      const places = await res.json();
+      renderPlaces(places);
+      animateNum('stat-places', places.length, 600);
+    }
+  } catch(e) {}
+}
+
+function renderPlaces(places) {
+  const list = document.getElementById('places-list');
+  if (!list) return;
+  if (!places || places.length === 0) {
+    list.innerHTML = '<p style="color:var(--muted);font-style:italic;text-align:center;padding:20px">Nenhum lugar adicionado ainda ♥</p>';
+    return;
+  }
+  list.innerHTML = places.map(p => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+      <div>
+        <div style="font-weight:700;font-size:14px">📍 ${p.name}</div>
+        ${p.description ? `<div style="font-size:12px;color:var(--muted);margin-top:3px">${p.description}</div>` : ''}
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">${p.latitude.toFixed(4)}, ${p.longitude.toFixed(4)}</div>
+      </div>
+      <button onclick="deletePlace('${p.id}')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:4px 8px" title="Remover">✕</button>
+    </div>
+  `).join('');
+}
+
+async function searchPlace() {
+  const query = document.getElementById('place-search').value.trim();
+  if (!query) return;
+
+  const btn = document.querySelector('#panel-lugares .btn-primary');
+  btn.textContent = 'Buscando...'; btn.disabled = true;
+
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=1`, {
+      headers: { 'Accept-Language': 'pt-BR' }
+    });
+    const results = await res.json();
+
+    const resultsList = document.getElementById('place-results-list');
+    const resultsDiv = document.getElementById('place-results');
+
+    if (results.length === 0) {
+      resultsList.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:8px">Nenhum resultado encontrado. Tente outro nome.</p>';
+    } else {
+      resultsList.innerHTML = results.map(r => `
+        <div onclick="selectPlace('${r.display_name.replace(/'/g, "\'")}', ${r.lat}, ${r.lon})"
+          style="padding:10px 14px;background:var(--white);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:all .15s"
+          onmouseover="this.style.borderColor='var(--rose)'" onmouseout="this.style.borderColor='var(--border)'">
+          📍 ${r.display_name}
+        </div>
+      `).join('');
+    }
+    resultsDiv.style.display = 'block';
+  } catch(e) {
+    showToast('Erro na busca. Tente novamente.');
+  }
+
+  btn.textContent = 'Buscar'; btn.disabled = false;
+}
+
+function selectPlace(name, lat, lng) {
+  // Pega só o primeiro trecho do nome
+  const shortName = name.split(',')[0].trim();
+  document.getElementById('place-name').value = shortName;
+  document.getElementById('place-lat').value = lat;
+  document.getElementById('place-lng').value = lng;
+  document.getElementById('place-form').style.display = 'block';
+  document.getElementById('place-results').style.display = 'none';
+}
+
+async function savePlace() {
+  const token = localStorage.getItem('nh_token');
+  const name = document.getElementById('place-name').value.trim();
+  const desc = document.getElementById('place-desc').value.trim();
+  const lat = parseFloat(document.getElementById('place-lat').value);
+  const lng = parseFloat(document.getElementById('place-lng').value);
+
+  if (!name || !lat || !lng) { showToast('Preencha o nome do lugar.'); return; }
+
+  try {
+    const res = await fetch(`${API_URL}/places/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ name, description: desc || null, latitude: lat, longitude: lng, display_order: 0 })
+    });
+    if (res.ok) {
+      showToast('Lugar adicionado! ♥');
+      document.getElementById('place-name').value = '';
+      document.getElementById('place-desc').value = '';
+      document.getElementById('place-form').style.display = 'none';
+      document.getElementById('place-search').value = '';
+      await loadPlaces();
+    } else {
+      showToast('Erro ao salvar lugar.');
+    }
+  } catch(e) {
+    showToast('Erro ao salvar lugar.');
+  }
+}
+
+async function deletePlace(id) {
+  const token = localStorage.getItem('nh_token');
+  try {
+    await fetch(`${API_URL}/places/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    showToast('Lugar removido.');
+    await loadPlaces();
+  } catch(e) {
+    showToast('Erro ao remover lugar.');
+  }
+}
+
+// ── GERAR PDF ──
+async function gerarPDF() {
+  const btn = document.getElementById('btn-pdf');
+  btn.textContent = '⏳ Gerando PDF...';
+  btn.disabled = true;
+
+  try {
+    const album = JSON.parse(localStorage.getItem('nh_album') || '{}');
+    const token = localStorage.getItem('nh_token');
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    const W = 210, H = 297;
+    const roseR = 181, roseG = 96, roseB = 74;
+    const goldR = 201, goldG = 169, goldB = 110;
+
+    // ── CAPA ──
+    // Fundo creme
+    doc.setFillColor(253, 249, 245);
+    doc.rect(0, 0, W, H, 'F');
+
+    // Borda decorativa
+    doc.setDrawColor(roseR, roseG, roseB);
+    doc.setLineWidth(0.5);
+    doc.rect(8, 8, W-16, H-16);
+    doc.setLineWidth(0.2);
+    doc.rect(10, 10, W-20, H-20);
+
+    // Ornamento topo
+    doc.setFontSize(28);
+    doc.setTextColor(goldR, goldG, goldB);
+    doc.text('♥', W/2, 60, { align: 'center' });
+
+    // Título "Nossa História"
+    doc.setFontSize(14);
+    doc.setTextColor(roseR, roseG, roseB);
+    doc.text('Nossa História', W/2, 75, { align: 'center' });
+
+    // Nomes do casal
+    doc.setFontSize(32);
+    doc.setTextColor(30, 20, 16);
+    const couple = `${album.name1 || 'Nome'} & ${album.name2 || 'Nome'}`;
+    doc.text(couple, W/2, 110, { align: 'center' });
+
+    // Linha decorativa
+    doc.setDrawColor(goldR, goldG, goldB);
+    doc.setLineWidth(0.3);
+    doc.line(40, 118, W-40, 118);
+
+    // Data de início
+    if (album.start_date) {
+      const startDate = new Date(album.start_date);
+      const dateStr = 'juntos desde ' + startDate.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+      doc.setFontSize(12);
+      doc.setTextColor(154, 133, 122);
+      doc.text(dateStr, W/2, 128, { align: 'center' });
+    }
+
+    // Dias juntos
+    if (album.start_date) {
+      const days = Math.floor((new Date() - new Date(album.start_date)) / 864e5);
+      doc.setFontSize(40);
+      doc.setTextColor(roseR, roseG, roseB);
+      doc.text(days.toLocaleString('pt-BR'), W/2, 160, { align: 'center' });
+      doc.setFontSize(12);
+      doc.setTextColor(154, 133, 122);
+      doc.text('dias juntos', W/2, 170, { align: 'center' });
+    }
+
+    // Frase especial
+    if (album.quote) {
+      doc.setFontSize(11);
+      doc.setTextColor(100, 80, 70);
+      const lines = doc.splitTextToSize(`"${album.quote}"`, W - 60);
+      doc.text(lines, W/2, 200, { align: 'center' });
+    }
+
+    // Rodapé da capa
+    doc.setFontSize(9);
+    doc.setTextColor(180, 160, 150);
+    doc.text('Nossa História · feito com amor', W/2, H-20, { align: 'center' });
+
+    // ── PÁGINA 2: FOTOS ──
+    let memories = [];
+    try {
+      const res = await fetch(`${API_URL}/memories/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) memories = await res.json();
+    } catch(e) {}
+
+    if (memories.length > 0) {
+      doc.addPage();
+      doc.setFillColor(253, 249, 245);
+      doc.rect(0, 0, W, H, 'F');
+
+      doc.setFontSize(20);
+      doc.setTextColor(30, 20, 16);
+      doc.text('Nossas Memórias', W/2, 25, { align: 'center' });
+
+      doc.setDrawColor(goldR, goldG, goldB);
+      doc.setLineWidth(0.3);
+      doc.line(40, 30, W-40, 30);
+
+      let y = 40;
+      let col = 0;
+      const imgW = 85, imgH = 60, margin = 15, gap = 10;
+
+      for (const m of memories) {
+        if (m.photo_url) {
+          try {
+            // Carrega imagem via canvas para evitar CORS
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            await new Promise((resolve, reject) => {
+              img.onload = resolve;
+              img.onerror = reject;
+              img.src = m.photo_url;
+            });
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            const imgData = canvas.toDataURL('image/jpeg', 0.8);
+
+            const x = col === 0 ? margin : margin + imgW + gap;
+            doc.addImage(imgData, 'JPEG', x, y, imgW, imgH);
+
+            // Título da foto
+            doc.setFontSize(9);
+            doc.setTextColor(60, 40, 30);
+            doc.text(m.title || 'Memória', x + imgW/2, y + imgH + 5, { align: 'center', maxWidth: imgW });
+
+            col++;
+            if (col >= 2) {
+              col = 0;
+              y += imgH + 20;
+              if (y > H - 40) {
+                doc.addPage();
+                doc.setFillColor(253, 249, 245);
+                doc.rect(0, 0, W, H, 'F');
+                y = 20;
+              }
+            }
+          } catch(e) {
+            console.log('Erro ao carregar imagem:', e);
+          }
+        }
+      }
+    }
+
+    // ── PÁGINA 3: LUGARES ──
+    let places = [];
+    try {
+      const res = await fetch(`${API_URL}/places/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) places = await res.json();
+    } catch(e) {}
+
+    if (places.length > 0) {
+      doc.addPage();
+      doc.setFillColor(253, 249, 245);
+      doc.rect(0, 0, W, H, 'F');
+
+      doc.setFontSize(20);
+      doc.setTextColor(30, 20, 16);
+      doc.text('Nossos Lugares', W/2, 25, { align: 'center' });
+
+      doc.setDrawColor(goldR, goldG, goldB);
+      doc.setLineWidth(0.3);
+      doc.line(40, 30, W-40, 30);
+
+      let y = 45;
+      places.forEach((p, i) => {
+        doc.setFillColor(245, 232, 227);
+        doc.roundedRect(15, y-6, W-30, 22, 3, 3, 'F');
+
+        doc.setFontSize(11);
+        doc.setTextColor(roseR, roseG, roseB);
+        doc.text('📍', 22, y+4);
+
+        doc.setFontSize(12);
+        doc.setTextColor(30, 20, 16);
+        doc.text(p.name, 32, y+4);
+
+        if (p.description) {
+          doc.setFontSize(9);
+          doc.setTextColor(154, 133, 122);
+          doc.text(p.description, 32, y+11);
+        }
+
+        y += 30;
+        if (y > H - 30) {
+          doc.addPage();
+          doc.setFillColor(253, 249, 245);
+          doc.rect(0, 0, W, H, 'F');
+          y = 20;
+        }
+      });
+    }
+
+    // Salva o PDF
+    const filename = `nossa-historia-${(album.name1 || 'casal').toLowerCase()}-${(album.name2 || '').toLowerCase()}.pdf`;
+    doc.save(filename);
+    showToast('✓ PDF gerado com sucesso! ♥');
+
+  } catch(e) {
+    console.error('Erro ao gerar PDF:', e);
+    showToast('Erro ao gerar PDF. Tente novamente.');
+  }
+
+  btn.textContent = '⬇ Baixar PDF';
+  btn.disabled = false;
+}
+
+// ── TIMELINE ──
+async function loadTimeline() {
+  const token = localStorage.getItem('nh_token');
+  if (!token) return;
+  try {
+    const res = await fetch(`${API_URL}/timeline/`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.ok) {
+      const events = await res.json();
+      renderTimeline(events);
+    }
+  } catch(e) {
+    renderTimeline([]);
+  }
+}
+
+function renderTimeline(events) {
+  const list = document.getElementById('timeline-list');
+  if (!list) return;
+  if (!events || events.length === 0) {
+    list.innerHTML = '<p style="color:var(--muted);font-style:italic;text-align:center;padding:30px 0">Nenhum evento ainda. Adicione o primeiro momento especial de vocês! ♥</p>';
+    return;
+  }
+  // Ordena por data
+  const sorted = [...events].sort((a, b) => new Date(b.event_date) - new Date(a.event_date));
+  list.innerHTML = sorted.map(ev => {
+    const d = new Date(ev.event_date + 'T12:00:00');
+    const dateStr = d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+    return `
+    <div class="timeline-item" id="tl-${ev.id}">
+      <div class="timeline-dot ${ev.is_special ? 'timeline-dot-special' : ''}"></div>
+      <div class="timeline-body">
+        <div class="timeline-title">${ev.title}${ev.is_special ? ' ⭐' : ''}</div>
+        <div class="timeline-date">${dateStr}</div>
+        ${ev.description ? `<div class="timeline-desc">${ev.description}</div>` : ''}
+      </div>
+      <button class="timeline-del" onclick="deleteTimelineEvent('${ev.id}')" title="Remover">✕</button>
+    </div>`;
+  }).join('');
+}
+
+async function saveTimelineEvent() {
+  const token = localStorage.getItem('nh_token');
+  const title = document.getElementById('tl-title').value.trim();
+  const date = document.getElementById('tl-date').value;
+  const desc = document.getElementById('tl-desc').value.trim();
+  const special = document.getElementById('tl-special').checked;
+
+  if (!title || !date) { showToast('Preencha título e data.'); return; }
+
+  const btn = document.querySelector('#timeline-modal .btn-primary');
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API_URL}/timeline/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ title, event_date: date, description: desc || null, is_special: special })
+    });
+    if (res.ok) {
+      closeModal('timeline-modal');
+      showToast('Evento adicionado! ♥');
+      document.getElementById('tl-title').value = '';
+      document.getElementById('tl-date').value = '';
+      document.getElementById('tl-desc').value = '';
+      document.getElementById('tl-special').checked = false;
+      await loadTimeline();
+    } else {
+      showToast('Erro ao salvar evento.');
+    }
+  } catch(e) {
+    showToast('Erro ao salvar evento.');
+  }
+
+  btn.textContent = 'Salvar evento ♥'; btn.disabled = false;
+}
+
+async function deleteTimelineEvent(id) {
+  const token = localStorage.getItem('nh_token');
+  const el = document.getElementById(`tl-${id}`);
+  if (el) { el.style.opacity = '0'; el.style.transition = '.25s'; }
+  try {
+    await fetch(`${API_URL}/timeline/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    showToast('Evento removido.');
+    await loadTimeline();
+  } catch(e) {
+    showToast('Erro ao remover evento.');
+  }
+}
+
+// ── PAINEL DE PLANO DINÂMICO ──
+function renderPlanPanel() {
+  const albumStr = localStorage.getItem('nh_album');
+  if (!albumStr) return;
+  let a;
+  try { a = JSON.parse(albumStr); } catch(e) { return; }
+
+  const isPremium = a.plan === 'premium';
+  const section = document.getElementById('plan-section-dynamic');
+  if (!section) return;
+
+  if (isPremium) {
+    section.innerHTML = `
+      <div class="current-plan-card">
+        <div class="cp-badge">✦ Plano atual</div>
+        <div class="cp-name" style="color:var(--gold)">Premium ⭐</div>
+        <div class="cp-price">R$9,00 / mês · renovação automática via Stripe</div>
+        <ul class="cp-features">
+          <li>✓ Álbum completo com fotos ilimitadas</li>
+          <li>✓ Música do Spotify integrada</li>
+          <li>✓ Temas visuais exclusivos</li>
+          <li>✓ Exportar em PDF / livro</li>
+          <li>✓ Alertas de aniversário por e-mail</li>
+          <li>✓ Linha do Tempo ilimitada</li>
+          <li>✓ Sem marca d'água</li>
+        </ul>
+        <div class="cp-actions">
+          <button class="btn-cancel-plan" onclick="openModal('cancel-modal')">Cancelar assinatura</button>
+        </div>
+      </div>
+      <div class="plan-upgrade-card" style="background:var(--green-pale);border-color:var(--green)">
+        <div class="plan-upgrade-text">
+          <h3 style="color:var(--green)">🎉 Você está no Premium!</h3>
+          <p>Aproveite todos os recursos exclusivos. Compartilhe seu álbum com quem você ama.</p>
+        </div>
+        <button class="btn btn-primary" onclick="abrirAlbum()">Ver álbum ↗</button>
+      </div>`;
+  } else {
+    section.innerHTML = `
+      <div class="current-plan-card" style="border-color:var(--border2)">
+        <div class="cp-badge" style="color:var(--muted);background:var(--bg)">● Plano atual</div>
+        <div class="cp-name" style="font-size:26px">Básico</div>
+        <div class="cp-price">R$19,00 · pagamento único</div>
+        <ul class="cp-features" style="color:var(--muted)">
+          <li>✓ Álbum com fotos ilimitadas</li>
+          <li>✓ Lugares especiais no mapa</li>
+          <li>✓ Linha do Tempo</li>
+          <li style="opacity:0.5">✗ Música do Spotify</li>
+          <li style="opacity:0.5">✗ Exportar em PDF</li>
+          <li style="opacity:0.5">✗ Alertas de aniversário</li>
+        </ul>
+      </div>
+      <div class="plan-upgrade-card">
+        <div class="plan-upgrade-text">
+          <h3>⭐ Fazer upgrade para Premium</h3>
+          <p>Por apenas R$9/mês, desbloqueie Spotify, PDF e alertas de aniversário por e-mail.</p>
+        </div>
+        <button class="btn btn-primary" onclick="upgradeToPremium()">Fazer upgrade ♥</button>
+      </div>`;
+  }
+}
+
+async function upgradeToPremium() {
+  const token = localStorage.getItem('nh_token');
+  if (!token) { showToast('Faça login primeiro.'); return; }
+  const btn = document.querySelector('#plan-section-dynamic .btn-primary');
+  if (btn) { btn.textContent = 'Aguarde...'; btn.disabled = true; }
+  try {
+    const res = await fetch(`${API_URL}/payments/checkout?plan=premium`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      window.location.href = data.checkout_url;
+    } else {
+      showToast('Erro ao iniciar checkout. Tente novamente.');
+      if (btn) { btn.textContent = 'Fazer upgrade ♥'; btn.disabled = false; }
+    }
+  } catch(e) {
+    showToast('Erro de conexão. Tente novamente.');
+    if (btn) { btn.textContent = 'Fazer upgrade ♥'; btn.disabled = false; }
+  }
+}
+
+// ── BLOQUEIO POR PLANO ──
+function checkPlanForFeature(feature) {
+  const albumStr = localStorage.getItem('nh_album');
+  if (!albumStr) return false;
+  try {
+    const a = JSON.parse(albumStr);
+    const isPremium = a.plan === 'premium';
+    if (!isPremium) {
+      const featureNames = { pdf: 'PDF do álbum', spotify: 'Spotify' };
+      showToast(`⭐ ${featureNames[feature] || feature} é exclusivo do plano Premium. Faça upgrade!`);
+      showPanel('plano', document.querySelector('.nav-item:last-child'));
+      return false;
+    }
+    return true;
+  } catch(e) { return true; }
+}
+</script>
+</body>
+</html>

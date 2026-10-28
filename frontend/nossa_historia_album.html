@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nossa História — Ana & Lucas</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Lato:wght@300;400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root {
+    --bg: #faf7f4;
+    --cream: #f5efe8;
+    --warm-white: #fffdf9;
+    --rose: #b5604a;
+    --rose-light: #d4856f;
+    --rose-pale: #f2e4de;
+    --gold: #c9a96e;
+    --gold-light: #e2c99a;
+    --ink: #2a1f1a;
+    --ink2: #4a3a33;
+    --muted: #9a857a;
+    --border: #e8ddd5;
+    --shadow: rgba(42,31,26,0.08);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ── GRAIN OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px;
+    position: relative;
+    background: linear-gradient(160deg, #fff9f5 0%, #f5ebe2 50%, #eeddd2 100%);
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 80%, rgba(181,96,74,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 60% at 80% 20%, rgba(201,169,110,0.08) 0%, transparent 70%);
+  }
+
+  .hero-ornament {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 32px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    animation: fadeUp 1s ease both;
+  }
+
+  .hero-ornament::before, .hero-ornament::after {
+    content: '';
+    width: 48px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-light));
+  }
+  .hero-ornament::after { transform: scaleX(-1); }
+
+  .hero-names {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(52px, 10vw, 100px);
+    font-weight: 400;
+    line-height: 1;
+    color: var(--ink);
+    letter-spacing: -1px;
+    position: relative;
+    animation: fadeUp 1s 0.15s ease both;
+  }
+
+  .hero-names em {
+    font-style: italic;
+    color: var(--rose);
+  }
+
+  .hero-amp {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.6em;
+    color: var(--gold);
+    vertical-align: middle;
+    padding: 0 12px;
+  }
+
+  .hero-since {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--muted);
+    margin-top: 20px;
+    animation: fadeUp 1s 0.3s ease both;
+  }
+
+  /* ── COUNTER ── */
+  .counter-band {
+    background: var(--ink);
+    padding: 48px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .counter-band::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 100% at 50% 50%, rgba(181,96,74,0.15) 0%, transparent 70%);
+  }
+
+  .counter-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--gold-light);
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .counter-numbers {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .counter-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 32px;
+    position: relative;
+  }
+
+  .counter-unit:not(:last-child)::after {
+    content: '·';
+    position: absolute;
+    right: -4px;
+    top: 12px;
+    color: var(--rose);
+    font-size: 32px;
+  }
+
+  .counter-num {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(48px, 8vw, 80px);
+    font-weight: 700;
+    color: var(--warm-white);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .counter-unit-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  .counter-total {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--rose-light);
+    margin-top: 20px;
+    position: relative;
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 80px 24px;
+  }
+
+  .section-inner {
+    max-width: 1060px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+
+  .section-eyebrow {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--gold);
+    letter-spacing: 3px;
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(30px, 5vw, 44px);
+    font-weight: 400;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+  }
+
+  .section-title em { font-style: italic; color: var(--rose); }
+
+  .section-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .section-divider::before, .section-divider::after {
+    content: '';
+    width: 64px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border));
+  }
+  .section-divider::after { transform: scaleX(-1); }
+
+  .divider-heart { color: var(--rose-light); font-size: 14px; }
+
+  /* ── PHOTO GRID ── */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto;
+    gap: 16px;
+  }
+
+  .photo-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    cursor: pointer;
+    background: var(--cream);
+  }
+
+  .photo-card:nth-child(1) { grid-column: 1/6; grid-row: 1/3; }
+  .photo-card:nth-child(2) { grid-column: 6/9; grid-row: 1/2; }
+  .photo-card:nth-child(3) { grid-column: 9/13; grid-row: 1/2; }
+  .photo-card:nth-child(4) { grid-column: 6/10; grid-row: 2/3; }
+  .photo-card:nth-child(5) { grid-column: 10/13; grid-row: 2/3; }
+  .photo-card:nth-child(6) { grid-column: 1/5; grid-row: 3/4; }
+  .photo-card:nth-child(7) { grid-column: 5/9; grid-row: 3/4; }
+  .photo-card:nth-child(8) { grid-column: 9/13; grid-row: 3/4; }
+
+  @media (max-width: 768px) {
+    .photo-grid {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto;
+      gap: 8px;
+    }
+    .photo-card {
+      grid-column: auto !important;
+      grid-row: auto !important;
+    }
+    .photo-card:nth-child(1) {
+      grid-column: 1 / -1 !important;
+    }
+    .photo-placeholder { min-height: 160px !important; }
+    .photo-card:nth-child(1) .photo-placeholder { min-height: 240px !important; }
+  }
+
+  .photo-img {
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+
+  .photo-card:hover .photo-img { transform: scale(1.04); }
+
+  .photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(42,31,26,0.75) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+  }
+
+  .photo-card:hover .photo-overlay { opacity: 1; }
+
+  .photo-info { color: white; }
+
+  .photo-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 400;
+    display: block;
+  }
+
+  .photo-meta {
+    font-size: 12px;
+    opacity: 0.75;
+    margin-top: 4px;
+    display: flex;
+    gap: 10px;
+  }
+
+  /* Placeholder photos usando gradientes */
+  .photo-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── LIGHTBOX ── */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(26,18,14,0.95);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+
+  .lightbox.open { display: flex; }
+
+  .lightbox-inner {
+    max-width: 800px;
+    width: 100%;
+    animation: fadeUp 0.3s ease;
+  }
+
+  .lightbox-img-wrap {
+    border-radius: 4px;
+    overflow: hidden;
+    max-height: 70vh;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+  }
+
+  .lightbox-img-wrap img {
+    width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+  }
+
+  .lightbox-info {
+    padding: 24px 0 0;
+    color: var(--warm-white);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .lightbox-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 400;
+  }
+
+  .lightbox-desc {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--gold-light);
+    margin-top: 6px;
+  }
+
+  .lightbox-meta {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .lightbox-close {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .lightbox-close:hover { background: var(--rose); border-color: var(--rose); }
+
+  /* ── MAP ── */
+  .map-section { background: var(--cream); }
+
+  #map {
+    height: 480px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 40px var(--shadow);
+  }
+
+  .map-legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    justify-content: center;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ink2);
+    background: white;
+    padding: 8px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .legend-item:hover { border-color: var(--rose-light); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* ── MUSIC ── */
+  .music-section { background: var(--warm-white); }
+
+  .music-card {
+    max-width: 560px;
+    margin: 0 auto;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 12px 48px var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .music-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--rose), var(--gold));
+  }
+
+  .music-note {
+    font-size: 40px;
+    margin-bottom: 16px;
+    display: block;
+    animation: pulse 2s ease infinite;
+  }
+
+  .music-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 6px;
+  }
+
+  .music-artist {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 16px;
+    margin-bottom: 28px;
+  }
+
+  .spotify-embed {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .spotify-placeholder {
+    background: linear-gradient(135deg, #1DB954 0%, #158a3e 100%);
+    border-radius: 12px;
+    padding: 24px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .spotify-icon { font-size: 36px; }
+
+  .spotify-text { text-align: left; }
+  .spotify-text strong { display: block; font-size: 15px; margin-bottom: 4px; }
+  .spotify-text span { font-size: 13px; opacity: 0.8; }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; padding-left: 0; }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--border) 10%, var(--border) 90%, transparent);
+    transform: translateX(-50%);
+  }
+
+  @media (max-width: 640px) {
+    .timeline::before { left: 20px; }
+  }
+
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 1fr 48px 1fr;
+    gap: 0;
+    margin-bottom: 48px;
+    align-items: center;
+  }
+
+  .timeline-item:nth-child(even) .tl-content { grid-column: 3; grid-row: 1; text-align: left; }
+  .timeline-item:nth-child(even) .tl-empty { grid-column: 1; grid-row: 1; }
+  .timeline-item:nth-child(odd) .tl-content { text-align: right; }
+
+  @media (max-width: 640px) {
+    .timeline-item {
+      grid-template-columns: 48px 1fr;
+    }
+    .timeline-item:nth-child(even) .tl-content { grid-column: 2; text-align: left; }
+    .timeline-item:nth-child(even) .tl-empty { display: none; }
+    .timeline-item:nth-child(odd) .tl-content { grid-column: 2; text-align: left; }
+    .tl-empty { display: none; }
+    .tl-dot { grid-column: 1; }
+    .timeline::before { left: 20px; }
+  }
+
+  .tl-dot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tl-dot-inner {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--rose);
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--rose-light);
+    transition: transform 0.2s;
+  }
+
+  .timeline-item:hover .tl-dot-inner { transform: scale(1.4); }
+
+  .tl-content {
+    padding: 0 24px;
+  }
+
+  .tl-date {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .tl-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .tl-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink);
+    color: var(--warm-white);
+    text-align: center;
+    padding: 64px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  footer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(181,96,74,0.1) 0%, transparent 70%);
+  }
+
+  .footer-heart {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 20px;
+    animation: pulse 2.5s ease infinite;
+    position: relative;
+  }
+
+  .footer-names {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-style: italic;
+    color: var(--warm-white);
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .footer-since {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--gold-light);
+    position: relative;
+  }
+
+  .footer-cta {
+    margin-top: 40px;
+    position: relative;
+  }
+
+  .btn-create {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--rose) 0%, var(--rose-light) 100%);
+    color: white;
+    padding: 14px 36px;
+    border-radius: 100px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-decoration: none;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+    transition: all 0.3s;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(181,96,74,0.35);
+  }
+
+  .footer-brand {
+    margin-top: 24px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: relative;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── CUSTOM LEAFLET MARKER ── */
+  .custom-pin {
+    width: 32px;
+    height: 32px;
+    background: var(--rose);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    border: 3px solid white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .leaflet-popup-content-wrapper {
+    border-radius: 8px !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15) !important;
+    font-family: 'Lato', sans-serif !important;
+  }
+
+  .popup-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .popup-date {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--gold);
+  }
+
+  .popup-desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--cream); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-ornament">Nossa História</div>
+  <h1 class="hero-names">
+    Ana<span class="hero-amp">&</span><em>Lucas</em>
+  </h1>
+  <p class="hero-since">juntos desde 14 de fevereiro de 2021</p>
+  <p class="hero-quote" id="hero-quote" style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(16px,3vw,22px);color:#d4bfb6;margin-top:20px;max-width:600px;line-height:1.6;display:none"></p>
+</section>
+
+<!-- ── COUNTER ── -->
+<div class="counter-band">
+  <p class="counter-label">cada dia ao seu lado é um presente</p>
+  <div class="counter-numbers">
+    <div class="counter-unit">
+      <div class="counter-num" id="cnt-years">0</div>
+      <div class="counter-unit-label">Anos</div>
+    </div>
+    <div class="counter-unit">
+      <div class="counter-num" id="cnt-months">0</div>
+      <div class="counter-unit-label">Meses</div>
+    </div>
+    <div class="counter-unit">
+      <div class="counter-num" id="cnt-days">0</div>
+      <div class="counter-unit-label">Dias</div>
+    </div>
+    <div class="counter-unit">
+      <div class="counter-num" id="cnt-hours">0</div>
+      <div class="counter-unit-label">Horas</div>
+    </div>
+  </div>
+  <p class="counter-total" id="cnt-total"></p>
+</div>
+
+<!-- ── FOTOS ── -->
+<section>
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">memórias</span>
+      <h2 class="section-title">Nossos <em>Momentos</em></h2>
+      <div class="section-divider"><span class="divider-heart">♥</span></div>
+    </div>
+
+    <div class="photo-grid reveal" id="album-photo-grid">
+      <!-- Foto 1 - Grande -->
+      <div class="photo-card" onclick="openLightbox(0)">
+        <div class="photo-placeholder" style="background: linear-gradient(135deg,#f5cfc4,#e8a898,#d4786a); min-height:400px">
+          <span style="font-size:64px;opacity:0.4">🌅</span>
+        </div>
+        <div class="photo-overlay">
+          <div class="photo-info">
+            <span class="photo-title">Primeiro Encontro</span>
+            <div class="photo-meta">
+              <span>📍 Parque Ibirapuera</span>
+              <span>14 Fev 2021</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Foto 2 -->
+      <div class="photo-card" onclick="openLightbox(1)">
+        <div class="photo-placeholder" style="background: linear-gradient(135deg,#fde8d8,#f5c5a3,#e8a07a)">
+          <span style="font-size:48px;opacity:0.4">🌊</span>
+        </div>
+        <div class="photo-overlay">
+          <div class="photo-info">
+            <span class="photo-title">Viagem ao Litoral</span>
+            <div class="photo-meta"><span>📍 Ubatuba</span><span>Jul 2021</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- Foto 3 -->
+      <div class="photo-card" onclick="openLightbox(2)">
+        <div class="photo-placeholder" style="background: linear-gradient(135deg,#dce8f5,#a8c4e0,#7aa8d4)">
+          <span style="font-size:48px;opacity:0.4">🌃</span>
+        </div>
+        <div class="photo-overlay">
+          <div class="photo-info">
+            <span class="photo-title">Réveillon</span>
+            <div class="photo-meta"><span>📍 Rio de Janeiro</span><span>Jan 2022</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- Foto 4 -->
+      <div class="photo-card" onclick="openLightbox(3)">
+        <div class="photo-placeholder" style="background: linear-gradient(135deg,#f5ead8,#e8d0a8,#d4b578)">
+          <span style="font-size:48px;opacity:0.4">🍂</span>
+        </div>
+        <div class="photo-overlay">
+          <div class="photo-info">
+            <span class="photo-title">Outono em Gramado</span>
+            <div class="photo-meta"><span>📍 Gramado, RS</span><span>Abr 2022</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- Foto 5 -->
+      <div class="photo-card" onclick="openLightbox(4)">
+        <div class="photo-placeholder" style="background: linear-gradient(135deg,#e8d5f0,#c8a8e0,#a878c8)">
+          <span style="font-size:48px;opacity:0.4">🌸</span>
+        </div>
+        <div class="photo-overlay">
+          <div class="photo-info">
+            <span class="photo-title">Primavera</span>
+            <div class="photo-meta"><span>📍 Campos do Jordão</span><span>Set 2022</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- Foto 6 -->
+      <div class="photo-card" onclick="openLightbox(5)">
+        <div class="photo-placeholder" style="background: linear-gradient(135deg,#d8f0e8,#a8d8c0,#78c0a0)">
+          <span style="font-size:48px;opacity:0.4">🏔️</span>
+        </div>
+        <div class="photo-overlay">
+          <div class="photo-info">
+            <span class="photo-title">Trilha na Serra</span>
+            <div class="photo-meta"><span>📍 Petrópolis</span><span>Jan 2023</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- Foto 7 -->
+      <div class="photo-card" onclick="openLightbox(6)">
+        <div class="photo-placeholder" style="background: linear-gradient(135deg,#f8e8d0,#f0c8a0,#e0a870)">
+          <span style="font-size:48px;opacity:0.4">🎂</span>
+        </div>
+        <div class="photo-overlay">
+          <div class="photo-info">
+            <span class="photo-title">2 Anos Juntos</span>
+            <div class="photo-meta"><span>📍 São Paulo</span><span>Fev 2023</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- Foto 8 -->
+      <div class="photo-card" onclick="openLightbox(7)">
+        <div class="photo-placeholder" style="background: linear-gradient(135deg,#f5d8d8,#e8b0b0,#d88888)">
+          <span style="font-size:48px;opacity:0.4">✈️</span>
+        </div>
+        <div class="photo-overlay">
+          <div class="photo-info">
+            <span class="photo-title">Nossa Primeira Viagem Internacional</span>
+            <div class="photo-meta"><span>📍 Lisboa, Portugal</span><span>Jun 2023</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MAPA ── -->
+<section class="map-section">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">lugares especiais</span>
+      <h2 class="section-title">Nosso <em>Mapa</em></h2>
+      <div class="section-divider"><span class="divider-heart">♥</span></div>
+    </div>
+    <div id="map" class="reveal"></div>
+    <div class="map-legend reveal">
+<div id="map-legend-items"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MÚSICA ── -->
+<section class="music-section" id="music-section">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">a nossa canção</span>
+      <h2 class="section-title">Nossa <em>Música</em></h2>
+      <div class="section-divider"><span class="divider-heart">♥</span></div>
+    </div>
+    <div class="music-card reveal">
+      <span class="music-note">🎵</span>
+      <div class="music-title" id="music-title">Perfect</div>
+      <div class="music-artist" id="music-artist">Ed Sheeran</div>
+      <div class="spotify-placeholder">
+        <span class="spotify-icon">🎧</span>
+        <div class="spotify-text">
+          <strong>Ouça no Spotify</strong>
+          <span>Ed Sheeran · Perfect · ÷ (Divide)</span>
+        </div>
+      </div>
+      <p style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--muted);margin-top:20px;font-size:15px;line-height:1.6">
+        "I found a love for me... darling just dive right in, and follow my lead"
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ── TIMELINE ── -->
+<section id="timeline-section">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">nossa jornada</span>
+      <h2 class="section-title">Linha do <em>Tempo</em></h2>
+      <div class="section-divider"><span class="divider-heart">♥</span></div>
+    </div>
+    <div class="timeline reveal" id="timeline-public">
+      <!-- Preenchido dinamicamente via API /albums/{slug}/timeline -->
+      <p style="text-align:center;color:var(--muted);font-style:italic;padding:30px 0">Carregando momentos especiais...</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <span class="footer-heart">♥</span>
+  <div class="footer-names" id="footer-names">Ana & Lucas</div>
+  <div class="footer-since" id="footer-since">juntos desde 14 de fevereiro de 2021</div>
+  <div class="footer-cta">
+    <button class="btn-create" onclick="window.location.href='nossa_historia_criar.html'">
+      Crie o álbum do seu casal ♥
+    </button>
+  </div>
+  <div class="footer-brand">Nossa História · feito com amor</div>
+</footer>
+
+<!-- ── LIGHTBOX ── -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-inner">
+    <div class="lightbox-img-wrap" id="lightbox-img-wrap">
+    </div>
+    <div class="lightbox-info">
+      <div>
+        <div class="lightbox-title" id="lb-title"></div>
+        <div class="lightbox-desc" id="lb-desc"></div>
+      </div>
+      <div class="lightbox-meta" id="lb-meta"></div>
+    </div>
+  </div>
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+</div>
+
+<script>
+const API_URL = 'https://nossa-historia-api-production.up.railway.app';
+
+// ── CARREGA DADOS DA API ──
+async function loadAlbum() {
+  // Pega slug da URL: ?slug=ana-e-lucas
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('slug');
+  
+  if (!slug) {
+    // Sem slug — usa dados de exemplo
+    initPage(ALBUM_DEFAULT);
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/albums/${slug}`);
+    if (!res.ok) throw new Error('Álbum não encontrado');
+    const data = await res.json();
+
+    // Atualiza título da página
+    document.title = `Nossa História — ${data.name1} & ${data.name2}`;
+
+    // Atualiza hero
+    document.querySelector('.hero-names').innerHTML = `${data.name1}<span class="hero-amp">&</span><em>${data.name2}</em>`;
+    const startDate = new Date(data.start_date);
+    document.querySelector('.hero-since').textContent = 'juntos desde ' + startDate.toLocaleDateString('pt-BR', {day:'numeric', month:'long', year:'numeric'});
+
+    // Atualiza objeto ALBUM e reinicia contador
+    ALBUM.startDate = startDate;
+    ALBUM.couple = `${data.name1} & ${data.name2}`;
+
+    // Atualiza frase especial se existir
+    if (data.quote) {
+      const quoteEl = document.getElementById('hero-quote');
+      if (quoteEl) {
+        quoteEl.textContent = `"${data.quote}"`;
+        quoteEl.style.display = 'block';
+      }
+    }
+
+    // Atualiza rodapé
+    const footerNames = document.getElementById('footer-names');
+    if (footerNames) footerNames.textContent = `${data.name1} & ${data.name2}`;
+    const footerSince = document.getElementById('footer-since');
+    if (footerSince) footerSince.textContent = 'juntos desde ' + startDate.toLocaleDateString('pt-BR', {day:'numeric', month:'long', year:'numeric'});
+
+    // Música
+    if (data.music_name) {
+      const musicTitle = document.getElementById('music-title');
+      if (musicTitle) musicTitle.textContent = data.music_name;
+    }
+    if (data.music_artist) {
+      const musicArtist = document.getElementById('music-artist');
+      if (musicArtist) musicArtist.textContent = data.music_artist;
+    }
+
+    // Esconde seção de música por padrão
+    const musicSection = document.getElementById('music-section');
+    if (musicSection) musicSection.style.display = 'none';
+
+    // Spotify embed
+    if (data.spotify_url) {
+      if (musicSection) musicSection.style.display = '';
+      const trackId = data.spotify_url.split('/track/')[1]?.split('?')[0];
+      if (trackId) {
+        const placeholder = document.querySelector('.spotify-placeholder');
+        if (placeholder) {
+          placeholder.innerHTML = `<iframe style="border-radius:12px;width:100%;height:80px;" src="https://open.spotify.com/embed/track/${trackId}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+        }
+      }
+    } // fim if spotify_url
+
+    // Busca fotos reais da API
+    try {
+      const memoriesRes = await fetch(`${API_URL}/albums/${slug}/memories`);
+      if (memoriesRes.ok) {
+        const memories = await memoriesRes.json();
+        if (memories.length > 0) {
+          // Atualiza galeria com fotos reais no layout original
+          const gallery = document.getElementById('album-photo-grid');
+          if (gallery && memories.length > 0) {
+            // Salva memórias para o lightbox
+            _realMemories = memories;
+            gallery.innerHTML = memories.map((m, i) => `
+              <div class="photo-card" onclick="openLightbox(${i})" style="cursor:pointer">
+                <div class="photo-placeholder" style="background:${m.photo_url ? `url(${m.photo_url}) center/cover` : 'linear-gradient(135deg,#f5efe8,#e8ddd5)'};min-height:${i===0 ? '400px' : '200px'}">
+                  ${!m.photo_url ? '<span style="font-size:48px;opacity:0.3">📷</span>' : ''}
+                </div>
+                <div class="photo-overlay">
+                  <div class="photo-info">
+                    <span class="photo-title">${m.title || 'Memória'}</span>
+                    <div class="photo-meta">
+                      ${m.location_name ? `<span>📍 ${m.location_name}</span>` : ''}
+                      ${m.memory_date ? `<span>${m.memory_date}</span>` : ''}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `).join('');
+          } else if (gallery && memories.length === 0) {
+            gallery.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted);font-style:italic">As fotos de vocês aparecerão aqui ♥</div>';
+          }
+
+        }
+      }
+    } catch(e) {
+      console.log('Erro ao buscar memórias:', e);
+    }
+
+    // Busca eventos da Linha do Tempo
+    try {
+      const tlRes = await fetch(`${API_URL}/albums/${slug}/timeline`);
+      const tlEl = document.getElementById('timeline-public');
+      if (tlRes.ok) {
+        const events = await tlRes.json();
+        if (events && events.length > 0) {
+          const sorted = [...events].sort((a, b) => new Date(a.event_date) - new Date(b.event_date));
+          if (tlEl) {
+            tlEl.innerHTML = sorted.map((ev, i) => {
+              const d = new Date(ev.event_date + 'T12:00:00');
+              const dateStr = d.toLocaleDateString('pt-BR', {day:'numeric', month:'long', year:'numeric'});
+              const isEven = i % 2 === 1;
+              const dotStyle = ev.is_special ? 'background:var(--gold);box-shadow:0 0 0 4px var(--gold-pale)' : '';
+              return `
+              <div class="timeline-item reveal">
+                ${isEven ? `<div class="tl-empty"></div>` : `<div class="tl-content"><div class="tl-date">${dateStr}</div><div class="tl-title">${ev.title}${ev.is_special ? ' ⭐' : ''}</div>${ev.description ? `<div class="tl-desc">${ev.description}</div>` : ''}</div>`}
+                <div class="tl-dot"><div class="tl-dot-inner" style="${dotStyle}"></div></div>
+                ${isEven ? `<div class="tl-content"><div class="tl-date">${dateStr}</div><div class="tl-title">${ev.title}${ev.is_special ? ' ⭐' : ''}</div>${ev.description ? `<div class="tl-desc">${ev.description}</div>` : ''}</div>` : `<div class="tl-empty"></div>`}
+              </div>`;
+            }).join('');
+          }
+        } else {
+          if (tlEl) tlEl.innerHTML = '<p style="text-align:center;color:var(--muted);font-style:italic;padding:30px 0">Os momentos especiais de vocês aparecerão aqui ♥</p>';
+        }
+      } else {
+        if (tlEl) tlEl.innerHTML = '<p style="text-align:center;color:var(--muted);font-style:italic;padding:30px 0">Os momentos especiais de vocês aparecerão aqui ♥</p>';
+      }
+    } catch(e) {
+      console.log('Erro ao buscar timeline:', e);
+    }
+
+    // Busca lugares reais da API
+    try {
+      const placesRes = await fetch(`${API_URL}/albums/${slug}/places`);
+      if (placesRes.ok) {
+        const places = await placesRes.json();
+        if (places.length > 0) {
+          // Reinicia o mapa com lugares reais
+          const mapEl = document.getElementById('map');
+          if (mapEl) {
+            mapEl._leaflet_id = null;
+            mapEl.innerHTML = '';
+          }
+          await initMap(places);
+        }
+      }
+    } catch(e) {
+      console.log('Erro ao buscar lugares:', e);
+    }
+
+  } catch(e) {
+    console.log('Usando dados de exemplo:', e.message);
+  }
+}
+
+// ── DADOS DE EXEMPLO (fallback) ──
+const ALBUM_DEFAULT = null;
+const ALBUM = {
+  couple: "Ana & Lucas",
+  startDate: new Date("2021-02-14T15:30:00"),
+  photos: [
+    { title: "Primeiro Encontro", desc: "Foi aqui que tudo começou. Uma tarde de domingo que mudou tudo.", location: "Parque Ibirapuera, SP", date: "14 Fev 2021", emoji: "🌅", bg: "linear-gradient(135deg,#f5cfc4,#e8a898,#d4786a)" },
+    { title: "Viagem ao Litoral", desc: "Nosso primeiro final de semana na praia juntos.", location: "Ubatuba, SP", date: "Jul 2021", emoji: "🌊", bg: "linear-gradient(135deg,#fde8d8,#f5c5a3,#e8a07a)" },
+    { title: "Réveillon", desc: "Virar o ano com você foi a melhor decisão.", location: "Rio de Janeiro", date: "Jan 2022", emoji: "🌃", bg: "linear-gradient(135deg,#dce8f5,#a8c4e0,#7aa8d4)" },
+    { title: "Outono em Gramado", desc: "As folhas caindo e a gente de mãos dadas.", location: "Gramado, RS", date: "Abr 2022", emoji: "🍂", bg: "linear-gradient(135deg,#f5ead8,#e8d0a8,#d4b578)" },
+    { title: "Primavera", desc: "Flores em todo lugar — e você a mais bonita de todas.", location: "Campos do Jordão", date: "Set 2022", emoji: "🌸", bg: "linear-gradient(135deg,#e8d5f0,#c8a8e0,#a878c8)" },
+    { title: "Trilha na Serra", desc: "Subir junto é mais fácil quando a vista compensa.", location: "Petrópolis, RJ", date: "Jan 2023", emoji: "🏔️", bg: "linear-gradient(135deg,#d8f0e8,#a8d8c0,#78c0a0)" },
+    { title: "2 Anos Juntos", desc: "Dois anos que parecem uma vida inteira.", location: "São Paulo, SP", date: "Fev 2023", emoji: "🎂", bg: "linear-gradient(135deg,#f8e8d0,#f0c8a0,#e0a870)" },
+    { title: "Lisboa, Portugal", desc: "A primeira viagem internacional. Pastéis de Belém e amor.", location: "Lisboa, Portugal", date: "Jun 2023", emoji: "✈️", bg: "linear-gradient(135deg,#f5d8d8,#e8b0b0,#d88888)" },
+  ],
+  places: [
+    { name: "Primeiro Encontro", desc: "Onde tudo começou", date: "Fev 2021", lat: -23.5874, lng: -46.6570, color: "#b5604a" },
+    { name: "Ubatuba", desc: "Primeira viagem juntos", date: "Jul 2021", lat: -23.4336, lng: -45.0709, color: "#c9a96e" },
+    { name: "Rio de Janeiro", desc: "Réveillon inesquecível", date: "Jan 2022", lat: -22.9068, lng: -43.1729, color: "#7aa8d4" },
+    { name: "Gramado", desc: "Outono romântico", date: "Abr 2022", lat: -29.3795, lng: -50.8756, color: "#c9a96e" },
+    { name: "Lisboa, Portugal", desc: "Primeira viagem internacional", date: "Jun 2023", lat: 38.7223, lng: -9.1393, color: "#c9a96e" },
+    { name: "Campos do Jordão", desc: "Florada de primavera", date: "Set 2022", lat: -22.7396, lng: -45.5922, color: "#7aa8d4" },
+  ]
+};
+
+// ── CONTADOR ──
+function updateCounter() {
+  const now = new Date();
+  const start = ALBUM.startDate;
+  const diff = now - start;
+
+  const totalDays = Math.floor(diff / (1000*60*60*24));
+  const years = Math.floor(totalDays / 365);
+  const months = Math.floor((totalDays % 365) / 30);
+  const days = Math.floor(totalDays % 30);
+  const hours = now.getHours();
+
+  document.getElementById('cnt-years').textContent = years;
+  document.getElementById('cnt-months').textContent = months;
+  document.getElementById('cnt-days').textContent = days;
+  document.getElementById('cnt-hours').textContent = String(hours).padStart(2,'0');
+  document.getElementById('cnt-total').textContent = `${totalDays.toLocaleString('pt-BR')} dias de história juntos`;
+}
+
+// Carrega dados da API e inicia tudo
+loadAlbum();
+updateCounter();
+setInterval(updateCounter, 1000);
+
+// ── LIGHTBOX ──
+// Armazena fotos reais para o lightbox
+let _realMemories = [];
+
+function openLightbox(idx) {
+  const lb = document.getElementById('lightbox');
+  const wrap = document.getElementById('lightbox-img-wrap');
+
+  // Tenta usar memória real primeiro
+  const m = _realMemories[idx];
+  if (m) {
+    wrap.innerHTML = m.photo_url
+      ? `<img src="${m.photo_url}" style="max-width:100%;max-height:70vh;object-fit:contain;border-radius:8px">`
+      : `<div style="width:100%;height:300px;background:linear-gradient(135deg,#f5efe8,#e8ddd5);display:flex;align-items:center;justify-content:center;font-size:60px;border-radius:8px">📷</div>`;
+    document.getElementById('lb-title').textContent = m.title || 'Memória';
+    document.getElementById('lb-desc').textContent = m.description || '';
+    document.getElementById('lb-meta').innerHTML = `
+      ${m.location_name ? `<div>📍 ${m.location_name}</div>` : ''}
+      ${m.memory_date ? `<div style="margin-top:4px">${m.memory_date}</div>` : ''}
+    `;
+  } else {
+    // Fallback para fotos genéricas
+    const p = ALBUM.photos[idx];
+    if (!p) return;
+    wrap.innerHTML = `<div style="width:100%;height:300px;background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:80px;border-radius:8px">${p.emoji}</div>`;
+    document.getElementById('lb-title').textContent = p.title;
+    document.getElementById('lb-desc').textContent = p.desc;
+    document.getElementById('lb-meta').innerHTML = `<div>📍 ${p.location}</div><div style="margin-top:4px">${p.date}</div>`;
+  }
+
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(e) {
+  if (!e || e.target === document.getElementById('lightbox') || e.target.classList.contains('lightbox-close')) {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox({target: document.getElementById('lightbox')}); });
+
+// ── MAPA ──
+async function initMap(realPlaces) {
+  // Só usa lugares reais — sem fallback para dados genéricos
+  const places = realPlaces && realPlaces.length > 0 ? realPlaces : [];
+
+  // Atualiza legenda
+  const legendEl = document.getElementById('map-legend-items');
+  if (legendEl) {
+    if (places.length === 0) {
+      legendEl.innerHTML = '<span style="color:var(--muted);font-style:italic;font-size:13px">Nenhum lugar adicionado ainda</span>';
+    } else {
+      const colors = ['#b5604a','#c9a96e','#7aa8d4','#4a7c59','#8b6f9e'];
+      legendEl.innerHTML = places.map((p,i) => `
+        <div class="legend-item">
+          <div class="legend-dot" style="background:${colors[i % colors.length]}"></div>
+          ${p.name}
+        </div>
+      `).join('');
+    }
+  }
+
+  // Centraliza no primeiro lugar real ou default Brasil
+  const centerLat = places.length > 0 ? places[0].latitude || places[0].lat : -22;
+  const centerLng = places.length > 0 ? places[0].longitude || places[0].lng : -43;
+
+  const map = L.map('map', {
+    center: [centerLat, centerLng],
+    zoom: places.length > 1 ? 5 : 10,
+    zoomControl: true,
+    scrollWheelZoom: false,
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© CartoDB',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
+
+  places.forEach(place => {
+    const lat = place.latitude || place.lat;
+    const lng = place.longitude || place.lng;
+    const name = place.name;
+    const desc = place.description || place.desc || '';
+    const color = place.color || '#b5604a';
+
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="
+        width:16px;height:16px;
+        background:${color};
+        border-radius:50%;
+        border:3px solid white;
+        box-shadow:0 2px 8px rgba(0,0,0,0.25);
+      "></div>`,
+      iconSize: [16,16],
+      iconAnchor: [8,8],
+    });
+
+    L.marker([lat, lng], { icon })
+      .addTo(map)
+      .bindPopup(`
+        <div style="font-family:'Lato',sans-serif;padding:4px;min-width:160px">
+          <div style="font-family:'Playfair Display',serif;font-size:16px;color:#2a1f1a;margin-bottom:4px">${name}</div>
+          <div style="font-size:13px;color:#9a857a;margin-top:6px">${desc}</div>
+        </div>
+      `, { closeButton: false });
+  });
+
+  // Ajusta zoom para mostrar todos os pins
+  if (places.length > 1) {
+    const bounds = L.latLngBounds(places.map(p => [p.latitude || p.lat, p.longitude || p.lng]));
+    map.fitBounds(bounds, { padding: [40, 40] });
+  }
+}
+
+// initMap será chamado pelo loadAlbum com os lugares reais
+initMap(null);
+
+// ── SCROLL REVEAL ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

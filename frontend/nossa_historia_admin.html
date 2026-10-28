@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nossa História — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f4f1;
+  --surface: #ffffff;
+  --rose: #b5604a;
+  --rose-pale: #f2e4de;
+  --gold: #c9a96e;
+  --gold-pale: #faf3e6;
+  --ink: #1e1612;
+  --ink2: #3d2f28;
+  --muted: #9a857a;
+  --border: #ecddd5;
+  --shadow: rgba(30,22,18,0.07);
+  --green: #4a7c59;
+  --green-pale: #eaf4ee;
+  --red: #c0392b;
+  --red-pale: #fdecea;
+  --blue: #3a6b8a;
+  --blue-pale: #e8f2f8;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'Lato',sans-serif;font-weight:300;min-height:100vh}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(145deg,#fdf8f4,#f0e6dc)}
+.login-card{background:white;border-radius:16px;padding:48px 40px;width:100%;max-width:380px;box-shadow:0 24px 64px rgba(30,22,18,.13);border:1px solid var(--border)}
+.login-logo{font-family:'Playfair Display',serif;font-size:24px;font-style:italic;color:var(--rose);text-align:center;margin-bottom:4px}
+.login-logo span{color:var(--ink);font-style:normal}
+.login-sub{text-align:center;font-size:12px;color:var(--muted);margin-bottom:32px;text-transform:uppercase;letter-spacing:1px}
+.login-card label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink2);margin-bottom:6px;font-weight:700}
+.login-card input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:13px 16px;font-size:15px;font-family:'Lato',sans-serif;color:var(--ink);outline:none;margin-bottom:16px;transition:.2s}
+.login-card input:focus{border-color:var(--rose);background:white}
+.btn-login{width:100%;background:var(--rose);color:white;border:none;border-radius:100px;padding:14px;font-size:15px;cursor:pointer;font-family:'Lato',sans-serif;letter-spacing:.5px;transition:.2s}
+.btn-login:hover{background:#9a4d3b}
+.login-err{background:var(--red-pale);color:var(--red);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:16px;display:none}
+.login-err.show{display:block}
+
+/* APP */
+.app{display:none}
+.app.show{display:block}
+.topbar{background:var(--ink);color:white;padding:16px 28px;display:flex;align-items:center;justify-content:space-between}
+.topbar-logo{font-family:'Playfair Display',serif;font-size:20px;font-style:italic;color:var(--rose)}
+.topbar-logo span{color:white;font-style:normal}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.topbar-badge{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;background:rgba(181,96,74,.2);color:var(--rose);padding:4px 12px;border-radius:4px;font-family:'DM Mono',monospace}
+.btn-logout{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);border-radius:100px;padding:7px 16px;cursor:pointer;font-size:13px;font-family:'Lato',sans-serif;transition:.2s}
+.btn-logout:hover{background:rgba(255,255,255,.15)}
+
+.content{max-width:1200px;margin:0 auto;padding:32px 24px}
+.page-title{font-family:'Playfair Display',serif;font-size:28px;margin-bottom:6px}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:32px}
+
+/* STAT CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:32px}
+.stat-card{background:white;border-radius:12px;padding:22px 20px;border:1px solid var(--border);box-shadow:0 2px 8px var(--shadow)}
+.stat-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;font-weight:700}
+.stat-val{font-family:'Playfair Display',serif;font-size:36px;color:var(--ink)}
+.stat-hint{font-size:12px;color:var(--muted);margin-top:4px}
+.stat-green .stat-val{color:var(--green)}
+.stat-rose .stat-val{color:var(--rose)}
+.stat-gold .stat-val{color:var(--gold)}
+
+/* TABLES */
+.section-title{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:4px}
+.section-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.card{background:white;border-radius:12px;border:1px solid var(--border);box-shadow:0 2px 8px var(--shadow);overflow:hidden;margin-bottom:32px}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);padding:12px 16px;border-bottom:1px solid var(--border);text-align:left;font-weight:700;background:var(--bg)}
+td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;color:var(--ink2)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fdf9f6}
+.badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-family:'DM Mono',monospace}
+.badge-premium{background:var(--gold-pale);color:#8a6520}
+.badge-basic{background:var(--bg);color:var(--muted);border:1px solid var(--border)}
+.badge-active{background:var(--green-pale);color:var(--green)}
+.badge-inactive{background:var(--red-pale);color:var(--red)}
+.album-link{color:var(--rose);text-decoration:none;font-family:'DM Mono',monospace;font-size:12px}
+.album-link:hover{text-decoration:underline}
+
+/* REFRESH */
+.controls{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.btn{padding:9px 18px;border-radius:100px;border:none;cursor:pointer;font-size:13px;font-family:'Lato',sans-serif;transition:.2s}
+.btn-primary{background:var(--rose);color:white}
+.btn-primary:hover{background:#9a4d3b}
+.btn-secondary{background:white;color:var(--ink2);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--rose);color:var(--rose)}
+.last-refresh{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace}
+.loading{color:var(--muted);font-style:italic;font-size:13px;padding:20px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">Nossa <span>História</span></div>
+    <div class="login-sub">Painel Administrativo</div>
+    <div class="login-err" id="login-err">Token incorreto.</div>
+    <label>Token de acesso</label>
+    <input type="password" id="admin-token" placeholder="••••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()">
+    <button class="btn-login" onclick="doAdminLogin()">Acessar painel</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="topbar-logo">Nossa <span>História</span></div>
+    <div class="topbar-right">
+      <span class="topbar-badge">🔐 Admin</span>
+      <button class="btn-logout" onclick="doLogout()">← Sair</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <h1 class="page-title">Painel de Administração</h1>
+    <p class="page-sub">Visão geral do produto Nossa História</p>
+
+    <div class="controls">
+      <button class="btn btn-primary" onclick="loadAll()">↻ Atualizar dados</button>
+      <span class="last-refresh" id="last-refresh"></span>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row" id="stats-row">
+      <div class="stat-card"><div class="stat-label">Álbuns criados</div><div class="stat-val" id="s-total">—</div><div class="stat-hint">total de cadastros</div></div>
+      <div class="stat-card"><div class="stat-label">Álbuns ativos</div><div class="stat-val stat-green" id="s-active">—</div><div class="stat-hint">com pagamento confirmado</div></div>
+      <div class="stat-card"><div class="stat-label">Premium</div><div class="stat-val stat-gold" id="s-premium">—</div><div class="stat-hint">assinantes mensais</div></div>
+      <div class="stat-card"><div class="stat-label">Básico</div><div class="stat-val stat-rose" id="s-basic">—</div><div class="stat-hint">pagamento único</div></div>
+      <div class="stat-card"><div class="stat-label">Receita total</div><div class="stat-val stat-green" id="s-revenue">—</div><div class="stat-hint">confirmada via Stripe</div></div>
+      <div class="stat-card"><div class="stat-label">Visitas</div><div class="stat-val" id="s-views">—</div><div class="stat-hint">nos álbuns publicados</div></div>
+    </div>
+
+    <!-- PAGAMENTOS RECENTES -->
+    <div class="section-title">Pagamentos recentes</div>
+    <div class="section-sub">Últimas 10 transações confirmadas</div>
+    <div class="card">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Casal</th>
+              <th>E-mail</th>
+              <th>Plano</th>
+              <th>Valor</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody id="payments-tbody">
+            <tr><td colspan="5" class="loading">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TODOS OS ÁLBUNS -->
+    <div class="section-title">Todos os álbuns</div>
+    <div class="section-sub">Lista completa de cadastros (mais recentes primeiro)</div>
+    <div class="card">
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px">
+        <input type="text" id="search-albums" placeholder="Buscar por nome ou e-mail..." oninput="filterAlbums()" style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:7px;font-family:'Lato',sans-serif;font-size:13px;outline:none">
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Casal</th>
+              <th>E-mail</th>
+              <th>Slug</th>
+              <th>Plano</th>
+              <th>Status</th>
+              <th>Desde</th>
+              <th>Criado em</th>
+            </tr>
+          </thead>
+          <tbody id="albums-tbody">
+            <tr><td colspan="7" class="loading">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://nossa-historia-api-production.up.railway.app';
+let _allAlbums = [];
+
+function doAdminLogin() {
+  const token = document.getElementById('admin-token').value.trim();
+  if (!token) return;
+  localStorage.setItem('nh_admin_token', token);
+  document.getElementById('login-err').classList.remove('show');
+  loadAll();
+}
+
+function doLogout() {
+  localStorage.removeItem('nh_admin_token');
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('login-wrap').style.display = 'flex';
+  document.getElementById('admin-token').value = '';
+}
+
+// Auto-login se tiver token salvo
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('nh_admin_token');
+  if (saved) {
+    document.getElementById('admin-token').value = saved;
+    loadAll();
+  }
+});
+
+async function loadAll() {
+  const token = localStorage.getItem('nh_admin_token');
+  if (!token) return;
+
+  try {
+    // Stats
+    const statsRes = await fetch(`${API_URL}/admin/stats`, {
+      headers: { 'x-admin-token': token }
+    });
+    if (!statsRes.ok) {
+      if (statsRes.status === 401) {
+        document.getElementById('login-err').classList.add('show');
+        return;
+      }
+      throw new Error('Erro ao carregar stats');
+    }
+    const stats = await statsRes.json();
+    document.getElementById('login-wrap').style.display = 'none';
+    document.getElementById('app').classList.add('show');
+
+    document.getElementById('s-total').textContent = stats.total_albums;
+    document.getElementById('s-active').textContent = stats.active_albums;
+    document.getElementById('s-premium').textContent = stats.premium_albums;
+    document.getElementById('s-basic').textContent = stats.basic_albums;
+    document.getElementById('s-revenue').textContent = 'R$' + stats.total_revenue_brl.toLocaleString('pt-BR', {minimumFractionDigits:2});
+    document.getElementById('s-views').textContent = stats.total_views.toLocaleString('pt-BR');
+
+    // Pagamentos
+    const tbody = document.getElementById('payments-tbody');
+    if (stats.recent_payments.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted);font-style:italic;padding:20px">Nenhum pagamento ainda.</td></tr>';
+    } else {
+      tbody.innerHTML = stats.recent_payments.map(p => `
+        <tr>
+          <td><strong>${p.album}</strong></td>
+          <td style="font-family:'DM Mono',monospace;font-size:12px">${p.email}</td>
+          <td><span class="badge badge-${p.plan}">${p.plan}</span></td>
+          <td style="font-family:'Playfair Display',serif">R$ ${Number(p.amount).toFixed(2).replace('.',',')}</td>
+          <td style="font-family:'DM Mono',monospace;font-size:12px">${p.date}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Álbuns
+    const albumsRes = await fetch(`${API_URL}/admin/albums`, {
+      headers: { 'x-admin-token': token }
+    });
+    if (albumsRes.ok) {
+      _allAlbums = await albumsRes.json();
+      renderAlbums(_allAlbums);
+    }
+
+    document.getElementById('last-refresh').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR');
+
+  } catch(e) {
+    console.error(e);
+    alert('Erro ao carregar dados: ' + e.message);
+  }
+}
+
+function renderAlbums(albums) {
+  const tbody = document.getElementById('albums-tbody');
+  if (albums.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="color:var(--muted);font-style:italic;padding:20px">Nenhum álbum encontrado.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = albums.map(a => `
+    <tr>
+      <td><strong>${a.name1} & ${a.name2}</strong></td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${a.email}</td>
+      <td>
+        <a href="nossa_historia_album.html?slug=${a.slug}" target="_blank" class="album-link">${a.slug}</a>
+      </td>
+      <td><span class="badge badge-${a.plan}">${a.plan}</span></td>
+      <td><span class="badge ${a.is_active ? 'badge-active' : 'badge-inactive'}">${a.is_active ? 'ativo' : 'inativo'}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${a.start_date || '—'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${a.created_at || '—'}</td>
+    </tr>
+  `).join('');
+}
+
+function filterAlbums() {
+  const q = document.getElementById('search-albums').value.toLowerCase();
+  if (!q) { renderAlbums(_allAlbums); return; }
+  const filtered = _allAlbums.filter(a =>
+    (a.name1 + ' ' + a.name2).toLowerCase().includes(q) ||
+    a.email.toLowerCase().includes(q) ||
+    a.slug.toLowerCase().includes(q)
+  );
+  renderAlbums(filtered);
+}
+</script>
+</body>
+</html>
