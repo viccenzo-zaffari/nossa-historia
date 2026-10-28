@@ -32,7 +32,7 @@
     background: var(--bg);
     color: var(--ink);
     font-family: 'Lato', sans-serif;
-    font-weight: 300;
+    font-weight: 400;
     overflow-x: hidden;
   }
 
@@ -186,10 +186,10 @@
   }
 
   .counter-unit-label {
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--muted);
+    color: rgba(255,255,255,0.55);
     margin-top: 8px;
   }
 
@@ -220,7 +220,7 @@
   .section-eyebrow {
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
-    font-size: 14px;
+    font-size: 16px;
     color: var(--gold);
     letter-spacing: 3px;
     display: block;
@@ -475,71 +475,132 @@
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
   /* ── MUSIC ── */
-  .music-section { background: var(--warm-white); }
-
-  .music-card {
-    max-width: 560px;
-    margin: 0 auto;
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 40px;
-    text-align: center;
-    box-shadow: 0 12px 48px var(--shadow);
+  .music-section {
+    background: var(--ink);
     position: relative;
     overflow: hidden;
   }
 
-  .music-card::before {
+  .music-section::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--rose), var(--gold));
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 30% 50%, rgba(181,96,74,0.18) 0%, transparent 65%),
+      radial-gradient(ellipse 60% 80% at 75% 40%, rgba(201,169,110,0.12) 0%, transparent 65%);
   }
 
-  .music-note {
-    font-size: 40px;
-    margin-bottom: 16px;
+  .music-section .section-eyebrow { color: var(--gold-light); }
+  .music-section .section-title { color: var(--warm-white); }
+  .music-section .divider-heart { color: var(--rose-light); }
+  .music-section .section-divider::before,
+  .music-section .section-divider::after {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15));
+  }
+
+  .music-card {
+    max-width: 680px;
+    margin: 0 auto;
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 40px;
+    align-items: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 44px 48px;
+    backdrop-filter: blur(12px);
+  }
+
+  .music-vinyl {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 50%, #1a1a1a 0%, #1a1a1a 18%, transparent 18%),
+      radial-gradient(circle at 50% 50%, #2a2a2a 0%, #2a2a2a 32%, transparent 32%),
+      conic-gradient(from 0deg, #1f1f1f 0%, #2d2d2d 25%, #1f1f1f 50%, #2d2d2d 75%, #1f1f1f 100%);
+    box-shadow:
+      0 0 0 3px rgba(255,255,255,0.04),
+      0 16px 48px rgba(0,0,0,0.5);
+    position: relative;
+    flex-shrink: 0;
+    animation: spin 8s linear infinite;
+    animation-play-state: paused;
+  }
+
+  .music-vinyl::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--rose) 0%, var(--rose-light) 100%);
+    box-shadow: 0 0 12px rgba(181,96,74,0.6);
+  }
+
+  .music-playing .music-vinyl {
+    animation-play-state: running;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .music-info { position: relative; }
+
+  .music-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
     display: block;
-    animation: pulse 2s ease infinite;
+    margin-bottom: 10px;
   }
 
   .music-title {
     font-family: 'Playfair Display', serif;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 400;
+    color: var(--warm-white);
     margin-bottom: 6px;
+    line-height: 1.3;
   }
 
   .music-artist {
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
-    color: var(--muted);
-    font-size: 16px;
+    color: rgba(255,255,255,0.5);
+    font-size: 17px;
     margin-bottom: 28px;
   }
 
-  .spotify-embed {
-    border-radius: 12px;
-    overflow: hidden;
-  }
-
   .spotify-placeholder {
-    background: linear-gradient(135deg, #1DB954 0%, #158a3e 100%);
-    border-radius: 12px;
-    padding: 24px;
-    color: white;
-    display: flex;
-    align-items: center;
-    gap: 16px;
+    width: 100%;
   }
 
-  .spotify-icon { font-size: 36px; }
+  .spotify-placeholder iframe {
+    display: block;
+    border-radius: 12px;
+    width: 100%;
+  }
 
-  .spotify-text { text-align: left; }
-  .spotify-text strong { display: block; font-size: 15px; margin-bottom: 4px; }
-  .spotify-text span { font-size: 13px; opacity: 0.8; }
+  @media (max-width: 600px) {
+    .music-card {
+      grid-template-columns: 1fr;
+      text-align: center;
+      padding: 32px 24px;
+      gap: 28px;
+    }
+    .music-vinyl {
+      margin: 0 auto;
+    }
+  }
 
   /* ── TIMELINE ── */
   .timeline { position: relative; padding-left: 0; }
@@ -609,7 +670,7 @@
   .tl-date {
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
-    font-size: 13px;
+    font-size: 15px;
     color: var(--gold);
     letter-spacing: 1px;
     margin-bottom: 6px;
@@ -624,9 +685,9 @@
   }
 
   .tl-desc {
-    font-size: 14px;
-    color: var(--muted);
-    line-height: 1.7;
+    font-size: 16px;
+    color: var(--ink2);
+    line-height: 1.75;
   }
 
   /* ── FOOTER ── */
@@ -941,26 +1002,22 @@
 
 <!-- ── MÚSICA ── -->
 <section class="music-section" id="music-section">
-  <div class="section-inner">
+  <div class="section-inner" style="position:relative">
     <div class="section-header reveal">
       <span class="section-eyebrow">a nossa canção</span>
       <h2 class="section-title">Nossa <em>Música</em></h2>
       <div class="section-divider"><span class="divider-heart">♥</span></div>
     </div>
-    <div class="music-card reveal">
-      <span class="music-note">🎵</span>
-      <div class="music-title" id="music-title">Perfect</div>
-      <div class="music-artist" id="music-artist">Ed Sheeran</div>
-      <div class="spotify-placeholder">
-        <span class="spotify-icon">🎧</span>
-        <div class="spotify-text">
-          <strong>Ouça no Spotify</strong>
-          <span>Ed Sheeran · Perfect · ÷ (Divide)</span>
+    <div class="music-card reveal" id="music-card">
+      <div class="music-vinyl" id="music-vinyl"></div>
+      <div class="music-info">
+        <span class="music-label">nossa canção</span>
+        <div class="music-title" id="music-title">Perfect</div>
+        <div class="music-artist" id="music-artist">Ed Sheeran</div>
+        <div class="spotify-placeholder" id="spotify-placeholder">
+          <!-- Preenchido dinamicamente pelo JS com o iframe do Spotify -->
         </div>
       </div>
-      <p style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--muted);margin-top:20px;font-size:15px;line-height:1.6">
-        "I found a love for me... darling just dive right in, and follow my lead"
-      </p>
     </div>
   </div>
 </section>
@@ -1075,9 +1132,18 @@ async function loadAlbum() {
       if (musicSection) musicSection.style.display = '';
       const trackId = data.spotify_url.split('/track/')[1]?.split('?')[0];
       if (trackId) {
-        const placeholder = document.querySelector('.spotify-placeholder');
+        const placeholder = document.getElementById('spotify-placeholder');
         if (placeholder) {
-          placeholder.innerHTML = `<iframe style="border-radius:12px;width:100%;height:80px;" src="https://open.spotify.com/embed/track/${trackId}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+          placeholder.innerHTML = `<iframe
+            style="border-radius:12px;width:100%;height:152px;border:none;"
+            src="https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0"
+            allowfullscreen=""
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy">
+          </iframe>`;
+          // Ativa animação do vinyl quando música está disponível
+          const card = document.getElementById('music-card');
+          if (card) card.classList.add('music-playing');
         }
       }
     } // fim if spotify_url
@@ -1299,9 +1365,8 @@ async function initMap(realPlaces) {
     scrollWheelZoom: false,
   });
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution: '© CartoDB',
-    subdomains: 'abcd',
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19
   }).addTo(map);
 

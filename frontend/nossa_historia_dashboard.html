@@ -925,9 +925,10 @@ body {
   <div class="modal">
     <h3>Cancelar assinatura?</h3>
     <p>Você perderá acesso ao Spotify, temas exclusivos e exportação em PDF. Seu álbum continuará no ar, mas com recursos básicos.</p>
+    <p style="font-size:13px;color:var(--muted);margin-top:8px">Você será redirecionado ao portal seguro do Stripe para gerenciar sua assinatura.</p>
     <div class="modal-actions">
       <button class="btn btn-secondary btn-sm" onclick="closeModal('cancel-modal')">Manter Premium</button>
-      <button class="btn btn-danger btn-sm" onclick="closeModal('cancel-modal');showToast('Para cancelar, acesse o portal do Stripe ou entre em contato: suporte@nossahistoria.com')">Entendido</button>
+      <button class="btn btn-danger btn-sm" id="btn-go-portal" onclick="goToStripePortal()">Gerenciar no Stripe</button>
     </div>
   </div>
 </div>
@@ -1540,6 +1541,30 @@ function showPanel(name, navEl) {
 // ── MODALS ──
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+async function goToStripePortal() {
+  const token = localStorage.getItem('nh_token');
+  const btn = document.getElementById('btn-go-portal');
+  if (btn) { btn.textContent = 'Redirecionando...'; btn.disabled = true; }
+  try {
+    const res = await fetch(`${API_URL}/payments/portal`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      closeModal('cancel-modal');
+      window.location.href = data.portal_url;
+    } else {
+      const err = await res.json().catch(() => ({}));
+      showToast(err.detail || 'Erro ao acessar o portal. Tente novamente.');
+      if (btn) { btn.textContent = 'Gerenciar no Stripe'; btn.disabled = false; }
+    }
+  } catch(e) {
+    showToast('Erro de conexão. Verifique sua internet e tente novamente.');
+    if (btn) { btn.textContent = 'Gerenciar no Stripe'; btn.disabled = false; }
+  }
+}
 
 // ── TOAST ──
 let toastTimer;

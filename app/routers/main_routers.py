@@ -167,6 +167,20 @@ def create_checkout(plan: str = "basic", db: Session = Depends(get_db), current:
         raise HTTPException(400, str(e))
     return {"checkout_url": session.url, "session_id": session.id}
 
+@payments_router.post("/portal")
+def create_billing_portal(db: Session = Depends(get_db), current: Album = Depends(get_current_album)):
+    """Cria uma sessão no Stripe Billing Portal para o cliente gerenciar/cancelar o plano."""
+    if not current.stripe_customer_id:
+        raise HTTPException(400, "Nenhuma assinatura ativa encontrada.")
+    try:
+        portal = stripe.billing_portal.Session.create(
+            customer=current.stripe_customer_id,
+            return_url=f"{settings.FRONTEND_URL}/nossa_historia_dashboard.html",
+        )
+    except stripe.StripeError as e:
+        raise HTTPException(400, str(e))
+    return {"portal_url": portal.url}
+
 @payments_router.post("/webhook", status_code=200)
 def stripe_webhook(request: Request, stripe_signature: str = Header(None), db: Session = Depends(get_db)):
     import asyncio
